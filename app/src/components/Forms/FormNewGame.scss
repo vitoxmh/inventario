@@ -1,0 +1,357 @@
+.game-form{
+
+    position: relative;
+
+
+    &-radio{
+        position: absolute;
+        left: -9999999999999999px;
+        top: -99999999999999px;
+
+        &:checked + .game-form-checkbox-group-button{
+            background-color: rgba(0, 163, 136, 0.2);
+                border-color: rgb(0 163 136);
+                color: rgb(0 ,163 ,136);
+        }
+    }
+
+
+    &-aside{
+        grid-column: span 4 / span 4;
+
+        &--input{
+            grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+        }
+    }
+
+    &-label{
+        color: rgb(148 163 184);
+        font-weight: 600;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        margin-left: 0.25rem;
+    }
+
+    &-drop{
+        border-color: rgb(255 255 255 / 0.1);
+        padding: 2rem;
+        border-style: dashed;
+        border-width: 2px;
+        border-radius: 0.75rem;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        display: flex;
+
+        &-instagram{
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: space-around;
+
+
+            img{
+                width: 100px;
+                height: auto;
+            }
+
+        }
+
+        &:hover{
+            background-color: rgb(0 163 136 / 0.05);
+        }
+
+        &-title{
+            font-weight: 700;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            color: rgb(241 245 249);
+            margin-bottom: 0.25rem;
+        }
+
+        &-subtitle{
+            color: rgb(148 163 184);
+            font-size: 0.75rem;
+            line-height: 1rem;
+        }
+
+        &-icono{
+            color: rgb(0 163 136);
+            background-color: rgb(0 163 136 / 0.1);
+            border-radius: 9999px;
+            justify-content: center;
+            align-items: center;
+            width: 3.5rem;
+            height: 3.5rem;
+            display: flex;
+            margin-bottom: 1rem;
+
+            i{
+                font-size: 1.875rem;
+                line-height: 2.25rem;
+                color: rgb(0 163 136);
+            }
+        }
+
+
+        &-image{
+            background-color: rgb(27 27 29 );
+            border-color: rgb(255 255 255 / 0.1);
+            border-width: 1px;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            aspect-ratio: 3/4;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+
+            &-prev{
+                width: 100%;
+                height: auto;
+                object-fit: cover;
+            }
+
+            &:hover{
+                .game-form-drop-image-icono{
+                    opacity: 1;
+                }
+            }
+
+            &-icono{
+                color: rgb(100 116 139);
+                font-size: 2.25rem;
+                line-height: 2.5rem;
+                margin-bottom: 0.5rem;
+                opacity: 0.5;
+            }
+
+            &-text{
+                color: rgb(100 116 139);
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                font-weight: 700;
+                font-size: 10px;
+            }
+        }
+
+
+    }
+
+    &-input{
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem ;
+        background-color: rgb(27 27 29 / 0.5);
+        border-color: rgb(255 255 255 / 0.1);
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        color: rgb(241, 245, 249);
+        color: rgb(241, 245, 249);
+        width: 100%;
+        border-radius: 8px;
+        
+    }
+
+    &-50{
+
+    }
+
+    &-button-group{
+       display: flex;
+       gap: 0.5rem;
+       margin-top: 0.5rem;
+       margin-bottom: 0.5rem;
+       height: 54px;
+        align-items: center;
+
+    }
+
+    &-checkbox-group{
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+        display: grid;
+
+        &-label{
+            gap: 0.75rem;
+            align-items: center;
+            cursor: pointer;
+            display: flex;
+        }
+
+        &-item{
+            align-items: center;
+            display: inline-flex;
+            position: relative;
+        }
+
+        &-input{
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+            &:checked + .game-form-checkbox-group-d-check{
+
+                background-color: rgb(0 163 136);
+
+                &:after{
+                    transform: translateX(1.25rem);
+                }
+            }
+        }
+
+        &-text{
+            color: rgb(203 213 225);
+            font-weight: 500;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+        }
+
+        &-button{
+            
+            background: transparent;
+            color: rgb(203, 213, 225);
+            font-weight: 700;
+            font-size: 0.75rem;
+            line-height: 1rem;
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+            border: solid 1px rgba(203, 213, 225, 0.2);
+            border-radius: 0.5rem;
+            display: inline-flex;
+
+            &-selected{
+                background-color: rgba(0, 163, 136, 0.2);
+                border-color: rgb(0 163 136);
+                color: rgb(0 ,163 ,136);
+            }
+        }
+
+        &-d-check{
+            background-color: rgb(255 255 255 / 0.1);
+            border-radius: 9999px;
+            width: 2.75rem;
+            height: 1.5rem;
+
+            &:after{
+                content: '';
+                border-color: rgb(255 255 255);
+                background-color: rgb(255 255 255);
+                border-radius: 9999px;
+                border-width: 1px;
+                width: 1.25rem;
+                height: 1.25rem;
+                top: 2px;
+                left: 2px;
+                position: absolute;
+                transition: all 0.2s ease-in-out;
+            }
+        }
+        
+    }
+
+    &-100{
+        grid-column: span 2 / span 2;
+    }
+
+    &-title{
+       font-size: 3rem;
+       line-height: 1; 
+       letter-spacing: -0.025em;
+       font-weight: 700;
+       color: rgb(241 245 249);
+    }
+    
+
+    &-subtitle{
+        margin-top: 15px;
+        margin-bottom: 0.5rem;
+        color: rgb(148 163 184);
+        max-width: 32rem;
+        font-size: 16px;
+    }
+
+
+    &-container{
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 2rem;
+        display: grid;
+
+        &-inputs{
+            background-color: rgb(44 44 46);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            border-width: 1px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1.5rem;
+            display: grid;
+            margin-bottom: 30px;
+        }
+    }
+
+    &-data{
+        grid-column: span 8 / span 8;
+
+        &-title{
+            margin-bottom: 1rem;
+            color: rgb(0 163 136);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 0.75rem;
+            line-height: 1rem;
+            gap: 0.5rem;
+            align-items: center;
+            display: flex;
+            margin-bottom: 1.5rem;
+
+            &--white{
+                color: rgb(241 245 249);
+                margin-bottom: 0px;
+            }
+
+            span{
+                color: rgb(0 163 136);
+                font-size: 15px;
+            }
+        }
+    }
+    
+    &-action-button{
+        position: absolute;
+        right: 0;
+        bottom: 0;
+ 
+        &-save{
+            font-weight: 700;
+            padding-top: 0.625rem;
+            padding-bottom: 0.625rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            background-color: rgb(0 163 136);
+            gap: 0.5rem;
+            font-size: 16px;
+            align-items: center;
+            display: flex;
+            color: rgb(241 245 249);
+            border-radius: 8px;
+
+        }
+    }
+
+}

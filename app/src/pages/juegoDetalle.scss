@@ -1,0 +1,22 @@
+.card{
+    padding: 15px;
+    border-radius: 15px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    &-title{
+        font-size: 3em;
+        color: #000;
+        margin-bottom: 10px;
+    }
+
+    &-items{
+
+        li{
+            font-size: 1.2em;
+            margin-bottom: 8px;
+            color: var(--bs-body-bg);
+        }
+    }
+}

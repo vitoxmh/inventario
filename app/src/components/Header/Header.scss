@@ -1,0 +1,72 @@
+.header{
+	  position: fixed;
+		top: 0;
+		left: 288px;
+		right: 0;
+		height: 64px;
+        background-color: transparent !important;
+		border: solid 1px rgb(255 255 255 / 0.1);
+		display: flex;
+		align-items: center;
+		padding: 0 20px;
+		z-index: 10;
+		color: rgb(100, 116, 139);
+		flex-wrap: wrap;
+  justify-content: space-between;
+
+
+  &-menu{
+	display: flex;
+	align-items: center;
+	gap: 10px;
+
+	&-container{
+		display: flex;
+		align-items: center;
+		gap: 20px;
+	}
+	&-item{
+		color: rgb(154 188 182 / var(--tw-text-opacity, 1));
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		font-weight: 500;
+		font-size: 0.875rem;
+  		line-height: 1.25rem;
+	}
+  }
+
+  &-logo{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+	letter-spacing: -0.025em;
+	line-height: 1.25;
+	text-transform: uppercase;
+	font-weight: 700;
+	font-size: 1.25rem;
+	gap: 10px;
+
+	i{
+		width: 35px;
+	}
+  }
+
+		input{
+			background-color: rgb(255 255 255 / 0.05);
+			font-size: 0.875rem;
+  			line-height: 1.25rem;
+			border-radius: 0.75rem;
+			border: 0;
+			border-color: #6b7280;
+			color: rgb(100, 116, 139);
+
+			
+		}
+
+
+		&-detalle-juego{
+			width: 100%;
+			left: 0;
+		}
+}

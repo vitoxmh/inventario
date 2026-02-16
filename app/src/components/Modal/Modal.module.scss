@@ -1,0 +1,24 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background: #fff;
+  padding: 20px;
+  width: 480px;
+  border-radius: 8px;
+}
+
+.cerrar {
+  float: right;
+  border: none;
+  background: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--bs-tertiary-bg);
+}

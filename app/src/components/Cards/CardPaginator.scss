@@ -1,0 +1,40 @@
+.paginador{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgb(36, 36, 39);
+    border-color: rgb(39 58 55);
+    border-width: 1px;
+    border-radius: 0.75rem;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+
+    &-item{
+        width: 2.5rem;
+        height: 2.5rem;
+        background-color: rgb(27 40 38);
+        color: rgb(255 255 255);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        &-activo{
+            width: 2.5rem;
+            height: 2.5rem;
+            background-color: rgb(0 163 136);
+            color: rgb(255 255 255);
+            color: rgb(15 35 32);
+            font-weight: 700;
+        }
+
+        &:disabled {
+            cursor: default;
+            background-color: rgb(27, 27, 29);
+            opacity: 0.5;
+        }
+    }
+
+} 
+

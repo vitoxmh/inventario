@@ -1,0 +1,33 @@
+.breadcrumb{
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+    display: flex;
+
+    &-item{
+        color: rgb(154 188 182);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        font-weight: 700;
+        font-size: 0.75rem;
+        line-height: 1rem;
+
+        &-active{
+            color: rgb(0 194 162);
+        }
+    }
+
+    &-separator{
+        color: rgb(39 58 55);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        font-weight: 700;
+        font-size: 0.75rem;
+        line-height: 1rem;
+    }
+}

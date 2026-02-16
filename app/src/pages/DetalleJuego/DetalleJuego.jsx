@@ -1,0 +1,164 @@
+import { useParams, Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import Header from '../../components/Header/Header';
+import AsideGame from '../../components/Aside/AsideGame';
+import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
+import './DetalleJuego.scss';
+import { API_URL } from '../../config/api';
+
+export default function DetalleJuego() {  
+
+
+    const { id, id_imagen } = useParams();
+    const [juego, setJuego] = useState(null);
+    const [plataformas, setPlataformas] = useState([]);
+    const [portada, setPortada] = useState(null);
+    const [contraportada, setContraportada] = useState(null);
+    const [galeria, setGaleria] = useState([]);
+    const dialogRef = useRef(null);
+  
+    useEffect(() => {
+    
+            // Galeria
+        fetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
+        .then(r => r.json())
+        .then(setGaleria);
+
+
+        // Juego
+        fetch(`${API_URL}/games/?id=${id}`)
+        .then(r => r.json())
+        .then(setJuego);
+
+    }, [id, id_imagen]);
+
+
+    
+
+    if (!juego) return <p>Cargando...</p>;
+
+
+
+    const imgContraportada = galeria.find(imagen => imagen.tipo === "1");
+
+    const deleteImage = (id) => {
+
+   
+        fetch(`${API_URL}/imagenes/${id}/`, {
+            method: 'DELETE',
+        })
+        .then(r => r.json())
+        .then(data => {
+
+                if (data.ok) {
+                    setGaleria(galeria.filter(imagen => imagen.id !== id));
+                }
+  
+
+        });
+
+    }
+
+
+    const showImage = (imagen) => {
+
+    
+    }
+
+
+    return (
+        <>
+        <div class="container">
+            <Header clase="header-detalle-juego" />
+            <main className='main'>
+                 <AsideGame clase={"sidebar-detalle-juego"}
+                 section={"/editar-juego"} 
+                 imgPortada={juego.portada}
+                 imgContraportada={juego.contraportada}
+                 cartucho={juego.cartucho}
+                 manual={juego.manual} 
+                 caja={juego.caja}
+                 id={juego.id_juego}
+                 id_imagen={juego.id_imagen_games}
+                 />
+                 <div className='container-main'>
+                    <Breadcrumb items={[    
+                                            { label: "Games", to: "/games" },
+                                            { label: juego.plataforma, to: "/plataformas" },
+                                            { label: juego.titulo, active: true }
+                                        ]}/>
+                    <div className="detalle-juego">
+                        <h3 className="detalle-juego-title"><span>{juego.desarrollador}</span>{juego.titulo}</h3>
+                        <p className='detalle-juego-description'>Estado: {juego.estado}</p>
+                        <div className="detalle-juego-price">
+                            <p className="detalle-juego-price-title">Est. Market Value</p>
+                            <p className="detalle-juego-price-value">${juego.valor.toLocaleString("es-CL")}</p>
+                            <p className="detalle-juego-price-last">Last synced: 2h ago</p>
+                            <span className="detalle-juego-price-payments material-icons">payments</span>
+                        </div>
+                    </div>
+                    <div className='detalle-juego-cards'>
+                        <div className='detalle-juego-card'>
+                            <p className='detalle-juego-card-text'>Plataforma</p>
+                            <h4 className='detalle-juego-card-title'>{juego.plataforma}</h4>
+                        </div>
+                        <div className='detalle-juego-card'>
+                            <p className='detalle-juego-card-text'>Desarrollador</p>
+                            <h4 className='detalle-juego-card-title'>{juego.desarrollador}</h4>
+                        </div>
+                        
+                        <div className='detalle-juego-card'>
+                            <p className='detalle-juego-card-text'>Genero</p>
+                            <h4 className='detalle-juego-card-title'>{juego.genero}</h4>
+                        </div>
+                        <div className='detalle-juego-card'>
+                            <p className='detalle-juego-card-text'>Región</p>
+                            <h4 className='detalle-juego-card-title'>{juego.region}</h4>
+                        </div>
+                        <div className='detalle-juego-card'>
+                            <p className='detalle-juego-card-text'>Año Lanzamiento</p>
+                            <h4 className='detalle-juego-card-title'>{juego.lanzamiento}</h4>
+                        </div>
+                    </div>
+                    <div className='detalle-juego-gallery'>
+                        <h3 className='detalle-juego-gallery-title'>Physical Item Gallery</h3>
+                        <div className='detalle-juego-gallery-images'>
+
+                            {galeria.length >  0 ? galeria.filter(imagen => imagen.tipo === "4").map((imagen) => ( 
+                                <div className='detalle-juego-gallery-foto' key={imagen.id}>
+                                    <div className="detalle-juego-gallery-foto-btn">
+                                        <button 
+                                        onClick={() => { 
+                                             dialogRef.current.showModal();
+                                                dialogRef.current.querySelector(".modal-content").innerHTML = `<img src="http://localhost:8080/api/imagenes/uploads/${imagen.archivo}" alt="" width="100%" height="100%" style="object-fit: contain;" />`;
+                                            }}
+                                        className='detalle-juego-gallery-foto-btn-zoom material-icons'>zoom_in</button>
+                                        <button 
+                                        onClick={ () => deleteImage(imagen.id) }
+                                        className='detalle-juego-gallery-foto-btn-delete material-icons'>delete_outline</button>
+                                    </div>
+                                     <img
+                                        src={`${API_URL}/imagenes/uploads/${imagen.archivo}`}
+                                        alt=""
+                                        width={350}
+                                        className="w-full h-64 object-contain rounded shadow"
+                                    />
+                                                                </div>
+                            )) : <p>No hay imágenes disponibles</p>}
+                            
+                        </div>
+                    </div>
+                 </div>
+            </main>
+        </div>
+
+         <dialog ref={dialogRef} className="modal">
+            <button onClick={() => dialogRef.current.close()} className="modal-cerrar">x</button>
+           <div className="modal-content">
+
+           </div>
+        </dialog>
+        </>
+    );
+
+}
