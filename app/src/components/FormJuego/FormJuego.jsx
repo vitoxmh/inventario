@@ -103,8 +103,7 @@ const onChange = (e) => {
       
         juegoId = data.id;
 
-        console.log("Juego creado con ID:", juegoId);
-      }
+        
 
       /* 2️⃣ SUBIR IMÁGENES (nuevas) */
       if (imagenes.length > 0) {
@@ -140,9 +139,9 @@ const onChange = (e) => {
   return (
     <form onSubmit={onSubmit}>
     <div>
-      <h2 class="form-title">{juegoEditar ? "Editar juego" : "Nuevo juego"}</h2>
-        <div class="form-group">
-          <label class="form-group-label">
+      <h2 className="form-title">{juegoEditar ? "Editar juego" : "Nuevo juego"}</h2>
+        <div className="form-group">
+          <label className="form-group-label">
             <p>Titulo:</p>
             <input
               name="titulo"
@@ -153,7 +152,7 @@ const onChange = (e) => {
             />
           </label>
 
-          <label class="form-group-label">
+          <label className="form-group-label">
             <p>Plataforma:</p>
             <select
               name="plataforma_id"
@@ -168,7 +167,7 @@ const onChange = (e) => {
             </select>
           </label>
 
-          <label class="form-group-label">
+          <label className="form-group-label">
             <p>Región:</p>
             <select
               name="region"
@@ -184,7 +183,7 @@ const onChange = (e) => {
 
           </label>
 
-          <label class="form-group-label">
+          <label className="form-group-label">
             <p>Formato:</p>
             <select
               name="formato"
@@ -200,7 +199,7 @@ const onChange = (e) => {
 
           </label>
           
-          <label class="form-group-label">
+          <label className="form-group-label">
             <p>Estado:</p>
             <select
               name="estado"
@@ -216,7 +215,7 @@ const onChange = (e) => {
            
           </label>
 
-          <label class="form-group-label">
+          <label className="form-group-label">
             <p>Valor:</p>
             <input
               name="valor"
@@ -226,15 +225,15 @@ const onChange = (e) => {
             onChange={onChange}
           />
           </label>
-          <hr class="form-group-hr" />
+          <hr className="form-group-hr" />
           
-          <div class="form-group-checkboxes">
+          <div className="form-group-checkboxes">
 
-          <p class="form-group-checkboxes-text"><strong>Incluye:</strong> </p>
-          <div  class="form-group-checkboxes-list">
-            <div class="form-check form-switch">
-              <label class="form-check-label" for="switchCheckDefault">Cartucho:</label>
-                <input class="form-check-input" 
+          <p className="form-group-checkboxes-text"><strong>Incluye:</strong> </p>
+          <div  className="form-group-checkboxes-list">
+            <div className="form-check form-switch">
+              <label className="form-check-label" for="switchCheckDefault">Cartucho:</label>
+                <input className="form-check-input" 
                 type="checkbox" 
                 role="switch"
                 name="cartucho"
@@ -247,8 +246,8 @@ const onChange = (e) => {
             </div> 
 
 
-            <div class="form-check form-switch">
-                <input class="form-check-input" 
+            <div className="form-check form-switch">
+                <input className="form-check-input" 
                 type="checkbox" 
                 role="switch"
                 name="manual"
@@ -257,12 +256,12 @@ const onChange = (e) => {
                     setForm({ ...form, manual: e.target.checked ? 1 : 0 })
                 } 
               />
-                <label class="form-check-label" for="switchCheckDefault">Manual:</label>
+                <label className="form-check-label" for="switchCheckDefault">Manual:</label>
             </div>
 
 
-            <div class="form-check form-switch">
-                <input class="form-check-input" 
+            <div className="form-check form-switch">
+                <input className="form-check-input" 
                 type="checkbox" 
                 role="switch"
                 name="caja"
@@ -271,21 +270,21 @@ const onChange = (e) => {
                     setForm({ ...form, caja: e.target.checked ? 1 : 0 })
                 } 
               />
-                <label class="form-check-label" for="switchCheckDefault">Caja:</label>
+                <label className="form-check-label" for="switchCheckDefault">Caja:</label>
             </div>
           </div>
 
 
           </div>
 
-          <hr class="form-group-hr" />
+          <hr className="form-group-hr" />
 
           <p>
             {juegoEditar
               ? "Agregar nuevas imágenes"
               : "Imágenes del juego"}
           </p>
-          <label class="form-group-label">
+          <label className="form-group-label">
             <p>Imágenes:</p>
           <input
             type="file"

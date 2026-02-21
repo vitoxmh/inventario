@@ -81,8 +81,6 @@ const onChange = (e) => {
          let consolaId = consolaEditar.id;
          id_imagen = consolaEditar.id_imagen;
 
-         console.log("ID A EDITAR:", consolaId);
-
         const res = await fetch(
           `http://localhost:8080/api/consolas/${consolaId}/`,
           {
@@ -105,7 +103,6 @@ const onChange = (e) => {
 
         const data = await res.json();
         id_imagen = data.id;
-          console.log("Consola creada con ID:", consolaId);
 
       }
 
@@ -144,9 +141,9 @@ const onChange = (e) => {
   return (
     <form onSubmit={onSubmit}>
     <div>
-      <h2 class="form-title">{consolaEditar ? "Editar consola" : "Nueva consola"}</h2>
-        <div class="form-group">
-          <label class="form-group-label">
+      <h2 className="form-title">{consolaEditar ? "Editar consola" : "Nueva consola"}</h2>
+        <div className="form-group">
+          <label className="form-group-label">
             <p>Consola:</p>
             <input
               name="nombre"
@@ -158,7 +155,7 @@ const onChange = (e) => {
           </label>
 
 
-           <label class="form-group-label">
+           <label className="form-group-label">
             <p>Lanzamiento:</p>
             <input
               name="lanzamiento"
@@ -170,7 +167,7 @@ const onChange = (e) => {
           </label>
 
 
-           <label class="form-group-label">
+           <label className="form-group-label">
             <p>Valor:</p>
             <input
               name="valor"
@@ -182,7 +179,7 @@ const onChange = (e) => {
           </label>
 
 
-        <label class="form-group-label">
+        <label className="form-group-label">
             <p>Plataforma:</p>
             <select
               name="plataforma_id"
@@ -199,7 +196,7 @@ const onChange = (e) => {
           </label>
 
 
-        <label class="form-group-label form-group-imagenes">
+        <label className="form-group-label form-group-imagenes">
             <p>Imágenes:</p>
           <input
             type="file"

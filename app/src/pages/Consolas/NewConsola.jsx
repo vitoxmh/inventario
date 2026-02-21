@@ -11,7 +11,7 @@ export default function NewConsola() {
 
   return (
     <>
-      <div class="container">
+      <div className="container">
         <Aside/>
         <main className='main'>
           <Header/>

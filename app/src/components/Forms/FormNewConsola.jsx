@@ -217,7 +217,7 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
                 <h3 className='game-form-title'>Nueva Consola</h3>
                 <p className='game-form-subtitle'>Agrega una nueva consola.</p>
                  <div className="game-form-action-button">
-                    <button className='game-form-action-button-save' type="submit" ><span class="material-icons">save</span> {consolaEditar ? "Editar Juego" : "Nuevo Juego"}</button>
+                    <button className='game-form-action-button-save' type="submit" ><span className="material-icons">save</span> {consolaEditar ? "Editar Juego" : "Nuevo Juego"}</button>
                 </div> 
             </div>
             <div className='game-form-container'>

@@ -25,15 +25,12 @@ export default function EditConsola() {
         .then(setImagenes);
 
     
-}, []);
-
-
-console.log(consola);
+  }, [id, id_imagen]);
 
 
   return (
     <>
-      <div class="container">
+      <div className="container">
         <Aside/>
         <main className='main'>
           <Header/>

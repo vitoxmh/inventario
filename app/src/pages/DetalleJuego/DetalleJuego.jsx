@@ -68,7 +68,7 @@ export default function DetalleJuego() {
 
     return (
         <>
-        <div class="container">
+        <div className="container">
             <Header clase="header-detalle-juego" />
             <main className='main'>
                  <AsideGame clase={"sidebar-detalle-juego"}

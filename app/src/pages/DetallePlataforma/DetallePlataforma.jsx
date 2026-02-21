@@ -21,11 +21,10 @@ export default function DetallePlataforma() {
 
     }, [id]);
 
-   console.log(juegos[0]);
 
     return (
         <>
-            <div class="container">
+            <div className="container">
                 
                 <main className='main'>
                     <Header/>

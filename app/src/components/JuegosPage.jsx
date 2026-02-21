@@ -41,7 +41,6 @@ export default function JuegosPage() {
         ]}
         datos={juegos}
         onEdit={(juego) => {
-           console.log("EDITAR:", juego); // 👈 DEBUG
           setJuegoEditar(juego);
           setModalAbierto(true);
         }}

@@ -94,8 +94,6 @@ const onChange = (e) => {
         id_imagen = plataformaEditar.id_imagen;
 
 
-         console.log("ID A EDITAR:", plataformaId);
-
         const res = await fetch(
           `http://localhost:8080/api/plataformas/${plataformaId}/`,
           {
@@ -157,9 +155,9 @@ const onChange = (e) => {
   return (
     <form onSubmit={onSubmit}>
     <div>
-      <h2 class="form-title">{plataformaEditar ? "Editar plataforma" : "Nueva plataforma"}</h2>
-        <div class="form-group">
-          <label class="form-group-label">
+      <h2 className="form-title">{plataformaEditar ? "Editar plataforma" : "Nueva plataforma"}</h2>
+        <div className="form-group">
+          <label className="form-group-label">
             <p>Titulo:</p>
             <input
               name="nombre"
@@ -170,7 +168,7 @@ const onChange = (e) => {
             />
           </label>
 
-          <label class="form-group-label">
+          <label className="form-group-label">
             <p>Fabricante:</p>
             <select  name="fabricante" value={form.fabricante} onChange={onChange} >
               <option value="" disabled>Seleccione un fabricante</option>
@@ -182,7 +180,7 @@ const onChange = (e) => {
             </select>
           </label>
           
-           <label class="form-group-label form-group-imagenes mb-3">
+           <label className="form-group-label form-group-imagenes mb-3">
             <p>Imágenes:</p>
           <input
             type="file"
@@ -217,7 +215,7 @@ const onChange = (e) => {
 
 
         <button type="submit" className="btn btn-primary">
-          {plataformaEditar ? (<><i class='bi bi-floppy'></i> Guardar cambios</>) : (<><i class='bi bi-floppy'></i> Agregar plataforma</>)}
+          {plataformaEditar ? (<><i className='bi bi-floppy'></i> Guardar cambios</>) : (<><i className='bi bi-floppy'></i> Agregar plataforma</>)}
         </button>
       </div>
     </form>

@@ -22,7 +22,7 @@ export default function Plataformas() {
 
   return (
     <>
-      <div class="container">
+      <div className="container">
           <Aside plataformas={plataformas}/>
           <main className='main'>
             <Header/>
@@ -38,7 +38,7 @@ export default function Plataformas() {
                       <div className='list-cards-container-card'>
                         
                         <span className='list-cards-container-card-region'>Total juegos: {plataforma.total}</span>
-                        <img alt="Game Cover" class="list-cards-container-card-img"  src={plataforma.archivo? `http://localhost:8080/api/imagenes/uploads/${plataforma.archivo}` : "/img/default-game-cover.png"}></img>
+                        <img alt="Game Cover" className="list-cards-container-card-img"  src={plataforma.archivo? `http://localhost:8080/api/imagenes/uploads/${plataforma.archivo}` : "/img/default-game-cover.png"}></img>
                         <div className='list-cards-container-card-body'>
                           
                           <h3 className='list-cards-container-card-title'>{plataforma.nombre}</h3>

@@ -46,7 +46,6 @@ export default function ListConsolas() {
         datos={consolas}
 
         onEdit={(consola) => {
-           console.log("EDITAR:", consola); // 👈 DEBUG
           setConsolaEditar(consola);
           setModalAbierto(true);
         }}

@@ -41,7 +41,7 @@ export default function Home() {
 
   return (
     <>
-    <div class="container">
+    <div className="container">
         <Aside plataformas={plataformas}/>
         <main className='main'>
           <Header/>
@@ -63,7 +63,7 @@ export default function Home() {
                   <p className='list-info-box-aumento list-info-box-aumento--white'>48 added this week</p>
                 </div>
                 <Link to="/new-game/" className='list-info-box list-info-box--green'>
-                  <span class="material-icons text-3xl mb-1">add_circle</span>
+                  <span className="material-icons text-3xl mb-1">add_circle</span>
                   <p>Add New Game</p>
                 </Link>
             </div>

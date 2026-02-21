@@ -9,7 +9,7 @@ export default function CardGames({dataGame =null}) {
       <Link to={`/detalle-juego/${dataGame.id}/${dataGame.id_imagen}`} key={dataGame.id}>
                   <div className='list-cards-container-card'>
                     <span className='list-cards-container-card-region'>{dataGame.estado}</span>
-                    <img alt="Game Cover" class="list-cards-container-card-img"  src={dataGame.archivo? `${API_URL}/imagenes/uploads/${dataGame.archivo}` : "/img/default-game-cover.png"}></img>
+                    <img alt="Game Cover" className="list-cards-container-card-img"  src={dataGame.archivo? `${API_URL}/imagenes/uploads/${dataGame.archivo}` : "/img/default-game-cover.png"}></img>
                     <div className='list-cards-container-card-body'>
                       <div className='list-cards-container-card-estado'>
                         <span>{dataGame.region}</span> ${dataGame.valor.toLocaleString("es-CL")}
