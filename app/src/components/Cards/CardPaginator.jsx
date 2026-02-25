@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import "./CardPaginator.scss"; 
-
+import "./CardPaginator.scss";
+import { API_URL } from '../../config/api'; 
+ 
 export default function Cards({
   datos = [],
   columnas = 4,
@@ -53,7 +54,7 @@ export default function Cards({
                 className="list-cards-container-card-img"
                 src={
                   juego.portada
-                    ? `http://localhost:8080/api/imagenes/uploads/${juego.portada}`
+                    ? `${API_URL}/imagenes/uploads/${juego.portada}`
                     : "/img/default-game-cover.png"
                 }
               />

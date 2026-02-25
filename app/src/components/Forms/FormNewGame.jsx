@@ -43,6 +43,7 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
         "Clicker",
         "Cooperativo",
         "Competitivo",
+        "Compilación",
         "Deportes",
         "Educativo",
         "Estrategia",
@@ -266,7 +267,7 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
     }
 
     // Imagen existente (string)
-    return `http://localhost:8080/api/imagenes/uploads/${img.archivo}`;
+    return `${API_URL}/imagenes/uploads/${img.archivo}`;
     };
 
 return (

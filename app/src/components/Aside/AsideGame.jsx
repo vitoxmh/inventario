@@ -1,5 +1,6 @@
 import './Aside.scss'
 import { Link } from "react-router-dom";
+import { API_URL } from '../../config/api';
 
 export default function AsideGame({clase="", imgPortada = [], imgContraportada = null, cartucho, manual, caja,id,id_imagen, section = null}) {
 
@@ -7,8 +8,8 @@ export default function AsideGame({clase="", imgPortada = [], imgContraportada =
     <> 
      <aside className={`sidebar ${clase}`}>
         <div className="sidebar-imagen-principal img-hover">
-            <img src={`http://localhost:8080/api/imagenes/uploads/${imgPortada}`} alt="Logo GameVerse" className='logo-aside img-hover-main'/>
-            <img src={`http://localhost:8080/api/imagenes/uploads/${imgContraportada}`} alt="Imagen Contraportada" className='imagen-contraportada-aside img-hover-alt'/> 
+            <img src={`${API_URL}/imagenes/uploads/${imgPortada}`} alt="Logo GameVerse" className='logo-aside img-hover-main'/>
+            <img src={`${API_URL}/imagenes/uploads/${imgContraportada}`} alt="Imagen Contraportada" className='imagen-contraportada-aside img-hover-alt'/> 
             <div className="sidebar-imagen-principal-status">Activo</div>
         </div>
         <div className="sidebar-details-info">

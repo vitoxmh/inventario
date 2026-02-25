@@ -90,10 +90,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
 if (!$id && !$action) {
 
-    $stmt = $pdo->query("SELECT *,
-(SELECT count(*) as total FROM  juegos WHERE juegos.plataforma_id = plataformas.id) AS total,
-(SELECT archivo FROM imagenes WHERE imagenes.juego_id = plataformas.id_imagen AND tipo = 0 ORDER BY created_at DESC LIMIT 1) AS archivo
-FROM plataformas ORDER BY nombre ASC");
+    $stmt = $pdo->query("SELECT 
+    p.*,
+        COUNT(j.id) AS total,
+        (
+            SELECT archivo 
+            FROM imagenes i 
+            WHERE i.juego_id = p.id_imagen 
+            AND i.tipo = 0 
+            ORDER BY created_at DESC 
+            LIMIT 1
+        ) AS archivo
+    FROM plataformas p
+    LEFT JOIN juegos j ON j.plataforma_id = p.id
+    GROUP BY p.id
+    HAVING total > 0
+    ORDER BY p.nombre ASC;");
     $plataformas = $stmt->fetchAll(PDO::FETCH_ASSOC);
      echo json_encode($plataformas);
     exit;
