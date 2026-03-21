@@ -17,7 +17,8 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
         desarrollador: "",
         genero: "",
         region: "",
-        publicador: ""
+        publicador: "",
+        comentario: ""
     });
 
     const estadoOptions = ["Nuevo", "Usado - Excelente", "Usado - Bueno", "Usado - Aceptable"];
@@ -25,10 +26,12 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
     const [portada, setPortada] = useState(null);
     const [contraportada, setContraportada] = useState(null);
     const [galeria, setGaleria] = useState(null);
+    const [poster, setPoster] = useState(null);
 
     const portadaInputRef = useRef(null);
     const contraportadaInputRef = useRef(null);
     const galeriaInputRef = useRef(null);
+    const posterInputRef = useRef(null);
 
     const generosVideojuegos = [
         "Acción",
@@ -107,13 +110,15 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
                 desarrollador: juegoEditar.desarrollador || "",
                 genero: juegoEditar.genero || "",
                 region: juegoEditar.region || "",
-                publicador: juegoEditar.publicador || ""
+                publicador: juegoEditar.publicador || "",
+                comentario: juegoEditar.comentario || ""
             });
 
              // Cargar imágenes si vienen del juego
             setPortada(imagenesEditar.filter(img => img.tipo === '0').at(-1) || null);
             setContraportada(imagenesEditar.filter(img => img.tipo === '1').at(-1) || null);
             setGaleria(imagenesEditar.filter(img => img.tipo === '4') || []);
+            setPoster(imagenesEditar.filter(img => img.tipo === '2').at(-1) || null);
     }
     }, [juegoEditar, imagenesEditar]);
 
@@ -236,6 +241,23 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
 
 
 
+        if (poster) {
+
+            const fd = new FormData();
+            fd.append("imagenes[]", poster);
+            fd.append("juego_id", juegoId);
+            fd.append("tipo", '2');
+
+                const imgRes = await fetch(`${API_URL}/imagenes/`, {
+                    method: "POST",
+                    body: fd
+                });
+
+                if (!imgRes.ok) throw new Error("Error al subir imágenes");
+        }
+
+
+
 
   
       /* ✅ TODO OK */
@@ -337,7 +359,6 @@ return (
                                 className="game-form-input"
                                 id="genero"
                                 name="genero"
-                                required
                                 value={form.genero}
                                 onChange={onChange}
                                 required
@@ -437,9 +458,21 @@ return (
                                          className='game-form-checkbox-group-input'/>
                                         <div className='game-form-checkbox-group-d-check'></div>
                                     </div>
-                                    <span className='game-form-checkbox-group-text'>Cartucho/Disco</span>
+                                <span className='game-form-checkbox-group-text'>Cartucho/Disco</span>
                                 </label>
                             </div>
+                        </div>
+                        <div className='game-form-100'>
+                            <label className='game-form-label' htmlFor="comentario">Comentario</label>
+                            <textarea 
+                                className='game-form-input' 
+                                id="comentario" 
+                                name="comentario" 
+                                placeholder='Agregar un comentario sobre el juego...'
+                                value={form.comentario}
+                                onChange={onChange}
+                                rows="3"
+                            />
                         </div>
                     </div>
                 </div>
@@ -524,6 +557,27 @@ return (
 
                         <input type="file" accept="image/*" multiple ref={galeriaInputRef} style={{display:'none'}}
                             onChange={(e)=>setGaleria([...e.target.files])}
+                        />
+                    </div>
+
+                    <h4 className='game-form-data-title game-form-100 game-form-data-title--white'>Poster / Background</h4>
+                    <div className='game-form-drop-image game-form-100 drop-area'
+                        onDrop={(e)=>handleDrop(e,setPoster)} 
+                        onDragOver={(e)=>e.preventDefault()}
+                        onClick={()=>posterInputRef.current.click()}
+                    >
+
+                        {poster && poster !== null ? (
+                            <img src={getImageSrc(poster)} alt="poster" className="game-form-drop-image-prev" />
+                        ) : (
+                        <>
+                            <span className="material-icons game-form-drop-image-icono">image</span>
+                            <p className="game-form-drop-image-text">Poster Image</p>
+                        </>
+                        )}
+
+                        <input type="file" accept="image/*" ref={posterInputRef} style={{display:'none'}}
+                            onChange={(e)=>handleSelect(e,setPoster)}
                         />
                     </div>
                 </div>

@@ -81,7 +81,12 @@ export default function DetalleJuego() {
                  id={juego.id_juego}
                  id_imagen={juego.id_imagen_games}
                  />
-                 <div className='container-main'>
+                 <div className='container-main' style={juego.poster ? { 
+                        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.95) 30%), url(${API_URL}/imagenes/uploads/${juego.poster})`, 
+                        backgroundSize: 'cover', 
+                        backgroundPosition: 'center' 
+                    } : {}}>
+                    <div className="detalle-juego-overlay">
                     <Breadcrumb items={[    
                                             { label: "Games", to: "/games" },
                                             { label: juego.plataforma, to: "/plataformas" },
@@ -120,6 +125,12 @@ export default function DetalleJuego() {
                             <h4 className='detalle-juego-card-title'>{juego.lanzamiento}</h4>
                         </div>
                     </div>
+                    {juego.comentario && (
+                        <div className='detalle-juego-comentario'>
+                            <h4 className='detalle-juego-comentario-title'>Comentario</h4>
+                            <p className='detalle-juego-comentario-text'>{juego.comentario}</p>
+                        </div>
+                    )}
                     <div className='detalle-juego-gallery'>
                         <h3 className='detalle-juego-gallery-title'>Physical Item Gallery</h3>
                         <div className='detalle-juego-gallery-images'>
@@ -147,6 +158,7 @@ export default function DetalleJuego() {
                             )) : <p>No hay imágenes disponibles</p>}
                             
                         </div>
+                    </div>
                     </div>
                  </div>
             </main>

@@ -17,7 +17,6 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
     const [form, setForm] = useState({
         nombre: "",
         plataforma_id: "",
-        nombre: "",
         caja: "",
         manuales: "",
         carton: "",
@@ -39,7 +38,6 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
             setForm({
                     nombre: consolaEditar.nombre || "",
                     plataforma_id: consolaEditar.plataforma_id || "",
-                    nombre: consolaEditar.nombre || "",
                     caja: consolaEditar.caja || "",
                     manuales: consolaEditar.manuales || "",
                     carton: consolaEditar.carton || "",

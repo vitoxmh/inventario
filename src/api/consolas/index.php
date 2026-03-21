@@ -25,12 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         valor,
         comentario,
         otro,
-        estado)
+        estado,
+        type)
         VALUES (
             ?,
             ?,
             ?, 
             ?, 
+            ?,
             ?,
             ?,
             ?,
@@ -52,7 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data['valor'],
         $data['comentario'],
         $data['otro'],
-        $data['estado']
+        $data['estado'],
+        $data['type']
     ]);
 
     echo json_encode([

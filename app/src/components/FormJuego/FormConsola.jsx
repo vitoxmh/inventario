@@ -48,7 +48,7 @@ export default function FormConsola({ onSuccess, consolaEditar = null }) {
 
     if (!consolaEditar) return;
 
-    fetch(`http://localhost:8080/api/imagenes/?juego_id=${consolaEditar.id_imagen}`)
+    fetch(`${API_URL}/imagenes/?juego_id=${consolaEditar.id_imagen}`)
       .then(r => r.json())
       .then(setImagenesExistentes);
 
@@ -82,7 +82,7 @@ const onChange = (e) => {
          id_imagen = consolaEditar.id_imagen;
 
         const res = await fetch(
-          `http://localhost:8080/api/consolas/${consolaId}/`,
+          `${API_URL}/consolas/${consolaId}/`,
           {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -93,7 +93,7 @@ const onChange = (e) => {
         if (!res.ok) throw new Error("Error al editar el juego");
       } else {
         // CREAR
-        const res = await fetch("http://localhost:8080/api/consolas/", {
+        const res = await fetch(`${API_URL}/consolas/`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(form)
@@ -117,7 +117,7 @@ const onChange = (e) => {
         }
 
         const imgRes = await fetch(
-          "http://localhost:8080/api/imagenes/",
+          `${API_URL}/imagenes/`,
           {
             method: "POST",
             body: fd
@@ -213,7 +213,7 @@ const onChange = (e) => {
                 {imagenesExistentes.map(img => (
                   <img
                     key={img.id}
-                    src={`http://localhost:8080/api/imagenes/uploads/${img.archivo}`}
+                    src={`${API_URL}/imagenes/uploads/${img.archivo}`}
                     alt=""
                     style={{
                       width: 100,

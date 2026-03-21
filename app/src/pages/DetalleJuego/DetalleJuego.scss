@@ -178,7 +178,38 @@
 }
 
 .container-main {
-  padding: 30px 85px;
+
+}
+
+.detalle-juego-overlay {
+
+  padding: 20px;
+  border-radius: 0x;
+  min-height: 100%;
+}
+
+.detalle-juego-comentario {
+  margin-top: 20px;
+  padding: 1rem;
+  background: rgb(36, 36, 39);
+  border-color: rgb(39 58 55);
+  border-width: 1px;
+  border-radius: 0.5rem;
+
+  &-title {
+    color: rgb(0 194 162);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 10px;
+    margin-bottom: 8px;
+  }
+
+  &-text {
+    color: rgb(255 255 255);
+    font-size: 14px;
+    line-height: 1.5;
+  }
 }
 
 

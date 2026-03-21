@@ -45,7 +45,7 @@ export default function Consolas({consolaEditar}) {
                       <div className='list-cards-container-card'>
                         
                         <span className='list-cards-container-card-region'>Total juegos: {consola.total}</span>
-                        <img alt="Game Cover" className="list-cards-container-card-img"  src={consola.archivo? `http://localhost:8080/api/imagenes/uploads/${consola.archivo}` : "/img/default-game-cover.png"}></img>
+                        <img alt="Game Cover" className="list-cards-container-card-img"  src={consola.archivo? `${API_URL}/imagenes/uploads/${consola.archivo}` : "/img/default-game-cover.png"}></img>
                         <div className='list-cards-container-card-body'>
                           
                           <h3 className='list-cards-container-card-title'>{consola.nombre}</h3>

@@ -33,7 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         lanzamiento,
         desarrollador,
         genero,
-        publicador)
+        publicador,
+        comentario)
         VALUES (
             ?, 
             ?, 
@@ -46,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ?, 
             ?, 
             ?, 
+            ?,
             ?,
             ?,
             ?,
@@ -70,7 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data['lanzamiento'] ?? null,
         $data['desarrollador'] ?? null,
         $data['genero'] ?? null,
-        $data['publicador'] ?? null
+        $data['publicador'] ?? null,
+        $data['comentario'] ?? null
     ]);
 
     echo json_encode([
@@ -99,13 +102,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $id != null) {
     juegos.publicador,
     juegos.lanzamiento, 
     juegos.plataforma_id,
+    juegos.comentario,
     plataformas.nombre as plataforma, 
     juegos.id as id_juego, 
     juegos.id_imagen as id_imagen_games,
     (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1 ) AS portada,
-    (SELECT archivo FROM imagenes WHERE tipo = '1' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1 ) AS contraportada  
-    FROM juegos, 
-    plataformas 
+    (SELECT archivo FROM imagenes WHERE tipo = '1' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1 ) AS contraportada,
+    (SELECT archivo FROM imagenes WHERE tipo = '2' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1 ) AS poster  
+    FROM juegos, plataformas 
     WHERE juegos.plataforma_id = plataformas.id 
     AND juegos.id =?");
     $stmt->execute([$id]);
@@ -138,7 +142,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
       lanzamiento=?,
       desarrollador=?,
       genero=?,
-      publicador=?
+      publicador=?,
+      comentario=?
       WHERE id=?
     ");
 
@@ -156,6 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         $data['desarrollador'],
         $data['genero'],
         $data['publicador'],
+        $data['comentario'] ?? null,
         $id
     ]);
 

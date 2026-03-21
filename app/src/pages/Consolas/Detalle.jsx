@@ -95,7 +95,7 @@ export default function Detalle() {
                                         <button 
                                         onClick={() => { 
                                              dialogRef.current.showModal();
-                                                dialogRef.current.querySelector(".modal-content").innerHTML = `<img src="http://localhost:8080/api/imagenes/uploads/${imagen.archivo}" alt="" width="100%" height="100%" style="object-fit: contain;" />`;
+                                                dialogRef.current.querySelector(".modal-content").innerHTML = `<img src="${API_URL}/imagenes/uploads/${imagen.archivo}" alt="" width="100%" height="100%" style="object-fit: contain;" />`;
                                             }}
                                         className='detalle-juego-gallery-foto-btn-zoom material-icons'>zoom_in</button>
                                         <button 
