@@ -13,10 +13,10 @@ import DetallePlataforma from './pages/DetallePlataforma/DetallePlataforma';
 import NewConsola from './pages/Consolas/NewConsola';
 import DetalleConsola from './pages/Consolas/Detalle';
 import EditConsola from './pages/Consolas/EditConsola';
-import Amiibos from './pages/Amiibos/Amiibos';
-import NewAmiibo from './pages/Amiibos/NewAmiibo';
-import DetalleAmiibo from './pages/Amiibos/DetalleAmiibo';
-import EditAmiibo from './pages/Amiibos/EditAmiibo';
+import AmiibosYFiguras from './pages/Amiibos/Amiibos';
+import NewAmiiboYFigura from './pages/Amiibos/NewAmiibo';
+import DetalleAmiiboYFigura from './pages/Amiibos/DetalleAmiibo';
+import EditAmiiboYFigura from './pages/Amiibos/EditAmiibo';
 import Libros from './pages/Libros/Libros';
 import NewLibro from './pages/Libros/NewLibro';
 import DetalleLibro from './pages/Libros/DetalleLibro';
@@ -44,10 +44,10 @@ function App() {
           <Route path="/consolas/add/" element={<NewConsola />} />
           <Route path="/consolas/detalle/:id/:id_imagen/" element={<DetalleConsola />} />
           <Route path="/consolas/edit/:id/:id_imagen/" element={<EditConsola />} />
-          <Route path="/amiibos/" element={<Amiibos />} />
-          <Route path="/amiibos/nuevo/" element={<NewAmiibo />} />
-          <Route path="/amiibos/detalle/:id/:id_imagen/" element={<DetalleAmiibo />} />
-          <Route path="/amiibos/editar/:id/:id_imagen/" element={<EditAmiibo />} />
+          <Route path="/amiibos/" element={<AmiibosYFiguras />} />
+          <Route path="/amiibos/nuevo/" element={<NewAmiiboYFigura />} />
+          <Route path="/amiibos/detalle/:id/:id_imagen/" element={<DetalleAmiiboYFigura />} />
+          <Route path="/amiibos/editar/:id/:id_imagen/" element={<EditAmiiboYFigura />} />
           <Route path="/libros/" element={<Libros />} />
           <Route path="/libros/nuevo/" element={<NewLibro />} />
           <Route path="/libros/detalle/:id/:id_imagen/" element={<DetalleLibro />} />

@@ -21,6 +21,7 @@ export default function Libros() {
             <h2 className='list-cards-title'>Listado de Libros <span></span></h2>
             <Cards 
               apiEndpoint={`${API_URL}/libros/`} 
+              type="libro"
               onDelete={true}
               deleteEndpoint={`${API_URL}/libros/`}
             />

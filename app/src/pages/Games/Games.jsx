@@ -26,6 +26,7 @@ export default function Games() {
             <h2 className='list-cards-title'>Listado de Juegos <span></span></h2>
             <Cards 
               apiEndpoint={`${API_URL}/games/`} 
+              type="juego"
               onDelete={true}
               deleteEndpoint={`${API_URL}/games/`}
             />

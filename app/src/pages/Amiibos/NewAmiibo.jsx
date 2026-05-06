@@ -2,10 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from '../../config/api';
 
-export default function NewAmiibo() {
+export default function NewAmiiboYFigura() {
     const navigate = useNavigate();
     useEffect(() => {
-        document.title = 'Nuevo Amiibo';
+        document.title = 'Nuevo Amiibo / Figura';
     }, []);
     const [form, setForm] = useState({
         titulo: "",
@@ -49,11 +49,9 @@ export default function NewAmiibo() {
                 body: JSON.stringify(form)
             });
 
-            if (!res.ok) throw new Error("Error al crear el amiibo");
-
+            if (!res.ok) throw new Error("Error al crear el amiibo/figura");
+            
             const data = await res.json();
-
-            console.log(data.id_imagen)
 
             if (portada) {
                 const fd = new FormData();
@@ -65,7 +63,7 @@ export default function NewAmiibo() {
                     method: "POST",
                     body: fd
                 });
-                
+
                 if (!imgRes.ok) {
                     console.error("Error uploading portada:", await imgRes.text());
                 }
@@ -81,7 +79,7 @@ export default function NewAmiibo() {
                     method: "POST",
                     body: fd
                 });
-                
+
                 if (!imgRes.ok) {
                     console.error("Error uploading contraportada:", await imgRes.text());
                 }
@@ -106,20 +104,20 @@ export default function NewAmiibo() {
         <div className="container">
             <form onSubmit={onSubmit}>
                 <div className="game-form">
-                    <h3 className="game-form-title">Agregar Nuevo Amiibo</h3>
-                    <p className="game-form-subtitle">Catalogue sus amiibos y figuras coleccionables.</p>
+                    <h3 className="game-form-title">Agregar Nuevo Amiibo / Figura</h3>
+                    <p className="game-form-subtitle">Cataloga tus amiibos y figuras coleccionables.</p>
                     <div className="game-form-action-button">
                         <button className="game-form-action-button-save" type="submit">
-                            <span className="material-icons">save</span> Guardar Amiibo
+                            <span className="material-icons">save</span> Guardar
                         </button>
                     </div>
                 </div>
 
                 <div className="game-form-container">
                     <div className="game-form-data">
-                        <div className="game-form-container-inputs">
+                        <div className="game-form-100">
                             <h3 className="game-form-data-title game-form-100">
-                                <span className="material-icons">info</span> Información del Amiibo
+                                <span className="material-icons">info</span> Información del Amiibo / Figura
                             </h3>
                             <div className="game-form-100">
                                 <label className="game-form-label" htmlFor="titulo">Título</label>
@@ -128,7 +126,7 @@ export default function NewAmiibo() {
                                     type="text"
                                     id="titulo"
                                     name="titulo"
-                                    placeholder="Ingrese el título del amiibo"
+                                    placeholder="Ingresa el título"
                                     value={form.titulo}
                                     onChange={onChange}
                                     required
@@ -193,7 +191,7 @@ export default function NewAmiibo() {
                                     className="game-form-input"
                                     id="comentario"
                                     name="comentario"
-                                    placeholder="Agregar un comentario sobre el amiibo..."
+                                    placeholder="Agrega un comentario..."
                                     value={form.comentario}
                                     onChange={onChange}
                                     rows="3"
@@ -219,8 +217,8 @@ export default function NewAmiibo() {
                                         <div className="game-form-drop-icono">
                                             <i className="material-icons">upload_file</i>
                                         </div>
-                                        <p className="game-form-drop-title">Drag and drop imagen frontal</p>
-                                        <p className="game-form-drop-subtitle">Supporting PNG, JPG, WEBP (Max 10MB)</p>
+                                        <p className="game-form-drop-title">Arrastra y suelta imagen frontal</p>
+                                        <p className="game-form-drop-subtitle">Soporta PNG, JPG, WEBP (Max 10MB)</p>
                                     </>
                                 )}
                                 <input
@@ -248,8 +246,8 @@ export default function NewAmiibo() {
                                         <div className="game-form-drop-icono">
                                             <i className="material-icons">upload_file</i>
                                         </div>
-                                        <p className="game-form-drop-title">Drag and drop imagen trasera</p>
-                                        <p className="game-form-drop-subtitle">Supporting PNG, JPG, WEBP (Max 10MB)</p>
+                                        <p className="game-form-drop-title">Arrastra y suelta imagen trasera</p>
+                                        <p className="game-form-drop-subtitle">Soporta PNG, JPG, WEBP (Max 10MB)</p>
                                     </>
                                 )}
                                 <input

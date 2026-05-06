@@ -21,6 +21,7 @@ export default function Accesorios() {
             <h2 className='list-cards-title'>Listado de Accesorios <span></span></h2>
             <Cards 
               apiEndpoint={`${API_URL}/accesorios/`} 
+              type="accesorio"
               onDelete={true}
               deleteEndpoint={`${API_URL}/accesorios/`}
             />

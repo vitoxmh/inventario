@@ -21,6 +21,7 @@ export default function Consolas() {
             <h2 className='list-cards-title'>Listado de Consolas <span></span></h2>
             <Cards 
               apiEndpoint={`${API_URL}/consolas/`} 
+              type="consola"
               onDelete={true}
               deleteEndpoint={`${API_URL}/consolas/`}
             />

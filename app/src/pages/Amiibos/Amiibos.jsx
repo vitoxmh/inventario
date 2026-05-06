@@ -5,9 +5,9 @@ import Aside from '../../components/Aside/Aside'
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import { API_URL } from '../../config/api';
 
-export default function Amiibos() {  
+export default function AmiibosYFiguras() {  
   useEffect(() => {
-    document.title = 'Amiibos';
+    document.title = 'Amiibos y Figuras';
   }, []);
 
   return (
@@ -16,11 +16,12 @@ export default function Amiibos() {
       <main className='main'>
         <Header/>
         <div className='container-main'>
-          <Breadcrumb items={[{ label: "Amiibos", active: true }]}/>
+          <Breadcrumb items={[{ label: "Amiibos y Figuras", active: true }]}/>
           <div className='list-cards'>
-            <h2 className='list-cards-title'>Listado de Amiibos <span></span></h2>
+            <h2 className='list-cards-title'>Listado de Amiibos y Figuras <span></span></h2>
             <Cards 
               apiEndpoint={`${API_URL}/amiibos/`} 
+              type="amiibo"
               onDelete={true}
               deleteEndpoint={`${API_URL}/amiibos/`}
             />

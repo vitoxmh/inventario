@@ -5,18 +5,18 @@ import { API_URL } from '../../config/api';
 
 export default function Cards({
   apiEndpoint = `${API_URL}/games/`,
-  columnas = 4,
+  type = "juego", // "juego", "consola", "libro", "amiibo"
   porPagina = 20,
   onDelete = null,
   deleteEndpoint = null
 }) {
-  const [juegos, setJuegos] = useState([]);
+  const [items, setItems] = useState([]);
   const [pagina, setPagina] = useState(1);
   const [busqueda, setBusqueda] = useState("");
   const [totalPaginas, setTotalPaginas] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const cargarJuegos = useCallback(async () => {
+  const cargarItems = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams({
       page: pagina,
@@ -27,32 +27,32 @@ export default function Cards({
     try {
       const resp = await fetch(`${apiEndpoint}?${params}`);
       const data = await resp.json();
-      setJuegos(data.data || []);
+      setItems(data.data || []);
       setTotalPaginas(data.pagination?.totalPages || 0);
     } catch (error) {
-      console.error("Error cargando juegos:", error);
+      console.error(`Error cargando ${type}s:`, error);
     } finally {
       setLoading(false);
     }
   }, [apiEndpoint, pagina, porPagina, busqueda]);
 
   useEffect(() => {
-    cargarJuegos();
-  }, [cargarJuegos]);
+    cargarItems();
+  }, [cargarItems]);
 
   useEffect(() => {
     setPagina(1);
   }, [busqueda]);
 
-  const handleDelete = async (e, juego) => {
+  const handleDelete = async (e, item) => {
     e.preventDefault();
-    if (!window.confirm(`¿Eliminar "${juego.titulo}"?`)) return;
+    if (!window.confirm(`¿Eliminar "${item.titulo || item.nombre}"?`)) return;
     
     try {
-      const endpoint = deleteEndpoint ? `${deleteEndpoint}${juego.id}/` : `${apiEndpoint}${juego.id}/`;
+      const endpoint = deleteEndpoint ? `${deleteEndpoint}${item.id}/` : `${apiEndpoint}${item.id}/`;
       const resp = await fetch(endpoint, { method: 'DELETE' });
       if (resp.ok) {
-        cargarJuegos();
+        cargarItems();
       } else {
         alert("Error al eliminar");
       }
@@ -62,6 +62,66 @@ export default function Cards({
     }
   };
 
+  const getDetalleUrl = (item) => {
+    const baseUrls = {
+      'juego': `/detalle-juego/${item.id}/${item.id_imagen}`,
+      'consola': `/consolas/detalle/${item.id}/${item.id_imagen}`,
+      'libro': `/libros/detalle/${item.id}/${item.id_imagen}`,
+      'amiibo': `/amiibos/detalle/${item.id}/${item.id_imagen}`
+    };
+    return baseUrls[type] || baseUrls['juego'];
+  };
+
+  const renderCard = (item) => {
+    const isJuego = type === 'juego';
+    const isConsola = type === 'consola';
+    const isLibro = type === 'libro';
+    const isAmiibo = type === 'amiibo';
+
+    const titulo = item.titulo || item.nombre;
+    const subtitulo = isJuego ? item.plataforma : 
+                     isLibro ? `${item.autor || ''} ${item.anio ? `• ${item.anio}` : ''}` :
+                     isAmiibo ? `${item.anio || ''}` :
+                     item.plataforma || '';
+    
+    const imagenSrc = item.portada || item.archivo || item.iportada;
+    const defaultImg = "/img/default-game-cover.png";
+
+    return (
+      <Link to={getDetalleUrl(item)} key={item.id}>
+        <div className="list-cards-container-card">
+          {onDelete && (
+            <button 
+              className="card-delete-btn"
+              onClick={(e) => handleDelete(e, item)}
+              title="Eliminar"
+            >
+              <span className="material-icons">delete</span>
+            </button>
+          )}
+          <img
+            alt={titulo}
+            className="list-cards-container-card-img"
+            src={
+              imagenSrc
+                ? `${API_URL}/imagenes/uploads/${imagenSrc}`
+                : defaultImg
+            }
+          />
+
+          <div className="list-cards-container-card-body">
+            <h3 className="list-cards-container-card-title">
+              {titulo}
+            </h3>
+            <p className="list-cards-container-card-plataform">
+              {subtitulo}
+            </p>
+          </div>
+        </div>
+      </Link>
+    );
+  };
+
   return (
     <>
       <div className="search-container">
@@ -69,7 +129,7 @@ export default function Cards({
           <i className="material-icons search-icon">search</i>
           <input
             type="text"
-            placeholder="Buscar por título..."
+            placeholder={`Buscar por título...`}
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             className="search-input"
@@ -92,10 +152,10 @@ export default function Cards({
             <i className="material-icons">hourglass_empty</i>
             <p>Cargando...</p>
           </div>
-        ) : juegos.length === 0 ? (
+        ) : items.length === 0 ? (
           <div className="empty-message">
             <i className="material-icons">search_off</i>
-            <p>No se encontraron juegos</p>
+            <p>No se encontraron {type}s</p>
             {busqueda && (
               <button 
                 className="clear-search-btn"
@@ -106,42 +166,7 @@ export default function Cards({
             )}
           </div>
         ) : (
-          juegos.map(juego => (
-            <Link
-              to={`/detalle-juego/${juego.id}/${juego.id_imagen}`}
-              key={juego.id}
-            >
-              <div className="list-cards-container-card">
-                {onDelete && (
-                  <button 
-                    className="card-delete-btn"
-                    onClick={(e) => handleDelete(e, juego)}
-                    title="Eliminar"
-                  >
-                    <span className="material-icons">delete</span>
-                  </button>
-                )}
-                <img
-                  alt="Game Cover"
-                  className="list-cards-container-card-img"
-                  src={
-                    juego.portada
-                      ? `${API_URL}/imagenes/uploads/${juego.portada}`
-                      : "/img/default-game-cover.png"
-                  }
-                />
-
-                <div className="list-cards-container-card-body">
-                  <h3 className="list-cards-container-card-title">
-                    {juego.titulo}
-                  </h3>
-                  <p className="list-cards-container-card-plataform">
-                    {juego.plataforma}
-                  </p>
-                </div>
-              </div>
-            </Link>
-          ))
+          items.map(item => renderCard(item))
         )}
       </div>
 
