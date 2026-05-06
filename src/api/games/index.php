@@ -84,7 +84,7 @@ function getLastGames() {
         juegos.estado,
         juegos.region,
         plataformas.nombre AS plataforma,
-        (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1) AS archivo
+        (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1) AS portada
         FROM juegos, plataformas
         WHERE juegos.plataforma_id = plataformas.id
         ORDER BY juegos.created_at DESC

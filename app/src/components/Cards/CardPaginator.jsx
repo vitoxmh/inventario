@@ -64,20 +64,47 @@ export default function Cards({
 
   return (
     <>
-      <div>
-        <input
-          type="text"
-          placeholder="Buscar por título..."
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-        />
+      <div className="search-container">
+        <div className="search-box">
+          <i className="material-icons search-icon">search</i>
+          <input
+            type="text"
+            placeholder="Buscar por título..."
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            className="search-input"
+          />
+          {busqueda && (
+            <button 
+              className="search-clear"
+              onClick={() => setBusqueda("")}
+              title="Limpiar búsqueda"
+            >
+              <i className="material-icons">close</i>
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="list-cards-container">
         {loading ? (
-          <p>Cargando...</p>
+          <div className="loading-message">
+            <i className="material-icons">hourglass_empty</i>
+            <p>Cargando...</p>
+          </div>
         ) : juegos.length === 0 ? (
-          <p>No se encontraron juegos</p>
+          <div className="empty-message">
+            <i className="material-icons">search_off</i>
+            <p>No se encontraron juegos</p>
+            {busqueda && (
+              <button 
+                className="clear-search-btn"
+                onClick={() => setBusqueda("")}
+              >
+                Limpiar búsqueda
+              </button>
+            )}
+          </div>
         ) : (
           juegos.map(juego => (
             <Link
