@@ -1,16 +1,17 @@
 <?php
-require_once '../../config/db.php';
-require_once '../headers.php';
+require_once __DIR__ . '/../helpers.php';
 
-
-
-$id = $_GET['id'] ?? null;
-
-if (!$id) {
-
+if (!isset($_GET['id'])) {
     $stmt = $pdo->query("SELECT * FROM plataformas ORDER BY created_at DESC");
-    $plataformas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-     echo json_encode($plataformas);
-    exit;
+    jsonResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
+$id = $_GET['id'];
+$stmt = $pdo->prepare("SELECT * FROM plataformas WHERE id = ? ORDER BY created_at DESC");
+$stmt->execute([$id]);
+$plataforma = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$plataforma) {
+    jsonResponse(['error' => 'Plataforma no encontrada'], 404);
+}
+jsonResponse($plataforma);

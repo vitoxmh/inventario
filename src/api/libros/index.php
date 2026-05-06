@@ -1,97 +1,114 @@
 <?php
-require_once __DIR__ . '/../headers.php';
-require_once __DIR__ . '/../../config/db.php';
-
-header('Content-Type: application/json');
+require_once __DIR__ . '/../helpers.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
+$id = $_GET['id'] ?? null;
+$action = $_GET['action'] ?? null;
 
 switch ($method) {
     case 'GET':
-        getLibros();
+        if ($id) {
+            getLibro($id);
+        } elseif ($action === 'last') {
+            getLastLibros();
+        } else {
+            listLibros();
+        }
         break;
     case 'POST':
         createLibro();
         break;
     case 'PUT':
-        updateLibro();
+        updateLibro($id);
         break;
     case 'DELETE':
-        deleteLibro();
+        deleteLibro($id);
         break;
     default:
-        http_response_code(405);
-        echo json_encode(['error' => 'Method not allowed']);
-        break;
+        jsonResponse(['error' => 'Method not allowed'], 405);
 }
 
-function getLibros() {
+function getLibro($id) {
+    global $pdo;
+    requireId($id, 'ID de libro requerido');
+    
+    $stmt = $pdo->prepare("SELECT * FROM libros WHERE id = ?");
+    $stmt->execute([$id]);
+    $libro = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$libro) {
+        jsonResponse(['error' => 'Libro no encontrado'], 404);
+    }
+    jsonResponse($libro);
+}
+
+function getLastLibros() {
+    global $pdo;
+    $stmt = $pdo->query("SELECT 
+        libros.id, 
+        libros.titulo, 
+        libros.id_imagen,
+        libros.autor,
+        libros.anio,
+        libros.editorial,
+        libros.estado,
+        libros.precio as valor,
+        (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = libros.id_imagen ORDER BY imagenes.id DESC LIMIT 1) AS portada
+        FROM libros
+        ORDER BY libros.created_at DESC
+        LIMIT 10");
+    jsonResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
+}
+
+function listLibros() {
     global $pdo;
     
-    $id = $_GET['id'] ?? null;
-    $action = $_GET['action'] ?? null;
+    extract(getPaginationParams());
     
-    if ($action === 'last') {
-        try { 
-            $stmt = $pdo->query("SELECT 
-                libros.id, 
-                libros.titulo, 
-                libros.id_imagen,
-                libros.autor,
-                libros.anio,
-                libros.editorial,
-                libros.estado,
-                libros.precio as valor,
-                (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = libros.id_imagen ORDER BY imagenes.id DESC LIMIT 1 ) AS portada
-                FROM libros
-                ORDER BY libros.created_at DESC
-                LIMIT 10");
-            $libros = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            echo json_encode($libros);
-        } catch (PDOException $e) {
-            http_response_code(500);
-            echo json_encode(['error' => $e->getMessage()]);
-        }
-        return;
-    }
+    $estado = $_GET['estado'] ?? null;
+    $valor_min = $_GET['valor_min'] ?? null;
+    $valor_max = $_GET['valor_max'] ?? null;
+    $anio = $_GET['anio'] ?? null;
+    $orden = $_GET['orden'] ?? 'created_at_desc';
     
-    if ($id) {
-        try {
-            $stmt = $pdo->prepare("SELECT * FROM libros WHERE id = ?");
-            $stmt->execute([$id]);
-            $libro = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if (!$libro) {
-                http_response_code(404);
-                echo json_encode(['error' => 'Libro no encontrado']);
-                return;
-            }
-            
-            echo json_encode($libro);
-        } catch (PDOException $e) {
-            http_response_code(500);
-            echo json_encode(['error' => $e->getMessage()]);
-        }
-        return;
-    }
+    $where = [];
+    $params = [];
     
-    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
-    $search = isset($_GET['search']) ? $_GET['search'] : '';
-    
-    $page = max(1, $page);
-    $limit = max(1, min(100, $limit));
-    $offset = ($page - 1) * $limit;
-    
-    $countSql = "SELECT COUNT(*) as total FROM libros" . ($search ? " WHERE titulo LIKE :search OR autor LIKE :search" : "");
-    $countStmt = $pdo->prepare($countSql);
     if ($search) {
-        $countStmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+        $where[] = "(libros.titulo LIKE :search OR libros.autor LIKE :search)";
     }
-    $countStmt->execute();
-    $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+    if ($estado) {
+        $where[] = "libros.estado = :estado";
+        $params[':estado'] = $estado;
+    }
+    if ($valor_min !== null && $valor_min !== '') {
+        $where[] = "libros.precio >= :valor_min";
+        $params[':valor_min'] = $valor_min;
+    }
+    if ($valor_max !== null && $valor_max !== '') {
+        $where[] = "libros.precio <= :valor_max";
+        $params[':valor_max'] = $valor_max;
+    }
+    if ($anio) {
+        $where[] = "libros.anio = :anio";
+        $params[':anio'] = $anio;
+    }
     
-    $sql = "SELECT 
+    $whereClause = $where ? "WHERE " . implode(" AND ", $where) : "";
+    
+    $orderClause = match($orden) {
+        'titulo_asc' => 'ORDER BY libros.titulo ASC',
+        'titulo_desc' => 'ORDER BY libros.titulo DESC',
+        'valor_asc' => 'ORDER BY libros.precio ASC',
+        'valor_desc' => 'ORDER BY libros.precio DESC',
+        'anio_desc' => 'ORDER BY libros.anio DESC',
+        'calificacion_desc' => 'ORDER BY libros.calificacion DESC',
+        default => 'ORDER BY libros.created_at DESC'
+    };
+    
+    $countSql = "SELECT COUNT(*) as total FROM libros $whereClause";
+    
+    $dataSql = "SELECT 
                 libros.id, 
                 libros.titulo, 
                 libros.id_imagen,
@@ -101,120 +118,70 @@ function getLibros() {
                 libros.estado,
                 libros.calificacion,
                 libros.precio as valor,
-                (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = libros.id_imagen ORDER BY imagenes.id DESC LIMIT 1 ) AS portada
-                FROM libros" . ($search ? " WHERE libros.titulo LIKE :search OR libros.autor LIKE :search" : "") . " ORDER BY libros.created_at DESC LIMIT :limit OFFSET :offset";
+                (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = libros.id_imagen ORDER BY imagenes.id DESC LIMIT 1) AS portada
+                FROM libros $whereClause 
+                $orderClause 
+                LIMIT :limit OFFSET :offset";
     
-    $stmt = $pdo->prepare($sql);
-    if ($search) {
-        $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
-    }
-    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-    $stmt->execute();
-    $libros = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    echo json_encode([
-        'data' => $libros,
-        'pagination' => [
-            'page' => $page,
-            'limit' => $limit,
-            'total' => (int)$total,
-            'totalPages' => ceil($total / $limit)
-        ]
-    ]);
+    jsonResponse(getPaginatedResponse($pdo, $countSql, $dataSql, $params, $search, $limit, $offset));
 }
 
 function createLibro() {
     global $pdo;
     
-    $data = json_decode(file_get_contents('php://input'), true);
+    $data = getJsonInput();
+    validateRequired($data, 'titulo', 'Titulo es requerido');
     
-    if (!isset($data['titulo']) || empty($data['titulo'])) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Titulo es requerido']);
-        return;
-    }
+    $id_imagen = generateIdImagen();
     
-    $id_imagen = $data['id_imagen'] ?? bin2hex(random_bytes(16));
-    $titulo = $data['titulo'];
-    $autor = $data['autor'] ?? null;
-    $anio = $data['anio'] ?? null;
-    $editorial = $data['editorial'] ?? null;
-    $estado = $data['estado'] ?? null;
-    $calificacion = $data['calificacion'] ?? null;
-    $precio = $data['precio'] ?? null;
-    $comentario = $data['comentario'] ?? null;
+    $stmt = $pdo->prepare("INSERT INTO libros (id_imagen, titulo, autor, anio, editorial, estado, calificacion, precio, comentario) 
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([
+        $id_imagen,
+        $data['titulo'],
+        $data['autor'] ?? null,
+        $data['anio'] ?? null,
+        $data['editorial'] ?? null,
+        $data['estado'] ?? null,
+        $data['calificacion'] ?? null,
+        $data['precio'] ?? null,
+        $data['comentario'] ?? null
+    ]);
     
-    try {
-        $stmt = $pdo->prepare("INSERT INTO libros (id_imagen, titulo, autor, anio, editorial, estado, calificacion, precio, comentario) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$id_imagen, $titulo, $autor, $anio, $editorial, $estado, $calificacion, $precio, $comentario]);
-        
-        $id = $pdo->lastInsertId();
-        echo json_encode(['id' => $id, 'id_imagen' => $id_imagen, 'message' => 'Libro creado correctamente']);
-    } catch (PDOException $e) {
-        http_response_code(500);
-        echo json_encode(['error' => $e->getMessage()]);
-    }
+    $id = $pdo->lastInsertId();
+    jsonResponse(['id' => $id, 'id_imagen' => $id_imagen, 'message' => 'Libro creado correctamente'], 201);
 }
 
-function updateLibro() {
+function updateLibro($id) {
     global $pdo;
     
-    $id = $_GET['id'] ?? null;
+    requireId($id, 'ID requerido');
+    $data = getJsonInput();
+    validateRequired($data, 'titulo', 'Titulo es requerido');
     
-    if (!$id) {
-        http_response_code(400);
-        echo json_encode(['error' => 'ID requerido']);
-        return;
-    }
+    $stmt = $pdo->prepare("UPDATE libros SET titulo = ?, autor = ?, anio = ?, editorial = ?, estado = ?, calificacion = ?, precio = ?, comentario = ? 
+                           WHERE id = ?");
+    $stmt->execute([
+        $data['titulo'],
+        $data['autor'] ?? null,
+        $data['anio'] ?? null,
+        $data['editorial'] ?? null,
+        $data['estado'] ?? null,
+        $data['calificacion'] ?? null,
+        $data['precio'] ?? null,
+        $data['comentario'] ?? null,
+        $id
+    ]);
     
-    $data = json_decode(file_get_contents('php://input'), true);
-    
-    if (!isset($data['titulo']) || empty($data['titulo'])) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Titulo es requerido']);
-        return;
-    }
-    
-    $id_imagen = $data['id_imagen'] ?? null;
-    $titulo = $data['titulo'];
-    $autor = $data['autor'] ?? null;
-    $anio = $data['anio'] ?? null;
-    $editorial = $data['editorial'] ?? null;
-    $estado = $data['estado'] ?? null;
-    $calificacion = $data['calificacion'] ?? null;
-    $precio = $data['precio'] ?? null;
-    $comentario = $data['comentario'] ?? null;
-    
-    try {
-        $stmt = $pdo->prepare("UPDATE libros SET titulo = ?, autor = ?, anio = ?, editorial = ?, estado = ?, calificacion = ?, precio = ?, comentario = ? WHERE id = ?");
-        $stmt->execute([$titulo, $autor, $anio, $editorial, $estado, $calificacion, $precio, $comentario, $id]);
-        
-        echo json_encode(['message' => 'Libro actualizado correctamente']);
-    } catch (PDOException $e) {
-        http_response_code(500);
-        echo json_encode(['error' => $e->getMessage()]);
-    }
+    jsonResponse(['message' => 'Libro actualizado correctamente']);
 }
 
-function deleteLibro() {
+function deleteLibro($id) {
     global $pdo;
     
-    $id = $_GET['id'] ?? null;
+    requireId($id, 'ID requerido');
     
-    if (!$id) {
-        http_response_code(400);
-        echo json_encode(['error' => 'ID requerido']);
-        return;
-    }
-    
-    try {
-        $stmt = $pdo->prepare("DELETE FROM libros WHERE id = ?");
-        $stmt->execute([$id]);
-        
-        echo json_encode(['message' => 'Libro eliminado correctamente']);
-    } catch (PDOException $e) {
-        http_response_code(500);
-        echo json_encode(['error' => $e->getMessage()]);
-    }
+    $stmt = $pdo->prepare("DELETE FROM libros WHERE id = ?");
+    $stmt->execute([$id]);
+    jsonResponse(['message' => 'Libro eliminado correctamente']);
 }

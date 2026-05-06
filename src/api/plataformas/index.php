@@ -1,127 +1,121 @@
 <?php
-require_once '../../config/db.php';
-require_once '../headers.php';
+require_once __DIR__ . '/../helpers.php';
 
-
-
+$method = $_SERVER['REQUEST_METHOD'];
 $id = $_GET['id'] ?? null;
 $action = $_GET['action'] ?? null;
 
+switch ($method) {
+    case 'GET':
+        if ($id) {
+            getPlataforma($id);
+        } elseif ($action === 'countPlataformas') {
+            getCountPlataformas();
+        } elseif ($action === 'last') {
+            getLastPlataformas();
+        } else {
+            listPlataformas();
+        }
+        break;
+    case 'POST':
+        createPlataforma();
+        break;
+    case 'PUT':
+        updatePlataforma($id);
+        break;
+    case 'DELETE':
+        deletePlataforma($id);
+        break;
+    default:
+        jsonResponse(['error' => 'Method not allowed'], 405);
+}
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+function getPlataforma($id) {
+    global $pdo;
+    requireId($id, 'ID de plataforma requerido');
+    
+    $stmt = $pdo->prepare("SELECT * FROM plataformas WHERE id = ?");
+    $stmt->execute([$id]);
+    $plataforma = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$plataforma) {
+        jsonResponse(['error' => 'Plataforma no encontrada'], 404);
+    }
+    jsonResponse($plataforma);
+}
 
+function getLastPlataformas() {
+    global $pdo;
+    $stmt = $pdo->query("SELECT 
+        p.*,
+        (SELECT archivo FROM imagenes i WHERE i.juego_id = p.id_imagen AND i.tipo = 0 ORDER BY created_at DESC LIMIT 1) AS archivo
+        FROM plataformas p
+        ORDER BY p.created_at DESC
+        LIMIT 10");
+    jsonResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
+}
 
-    $data = json_decode(file_get_contents("php://input"), true);
+function listPlataformas() {
+    global $pdo;
+    $stmt = $pdo->query("SELECT 
+        p.*,
+        COUNT(j.id) AS total,
+        (SELECT archivo FROM imagenes i WHERE i.juego_id = p.id_imagen AND i.tipo = 0 ORDER BY created_at DESC LIMIT 1) AS archivo
+        FROM plataformas p
+        LEFT JOIN juegos j ON j.plataforma_id = p.id
+        GROUP BY p.id
+        ORDER BY p.nombre ASC");
+    jsonResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
+}
 
-    $stmt = $pdo->prepare("
-        INSERT INTO plataformas
-        (nombre, 
-        fabricante,
-        id_imagen
-        )
-        VALUES (
-            ?, 
-            ?,
-            ?
-        )"); 
+function getCountPlataformas() {
+    global $pdo;
+    $stmt = $pdo->query("SELECT *,
+        (SELECT count(*) FROM juegos WHERE juegos.plataforma_id = plataformas.id) as total,
+        (SELECT SUM(juegos.valor) FROM juegos WHERE juegos.plataforma_id = plataformas.id) as totalprecio
+        FROM plataformas 
+        ORDER BY total DESC");
+    jsonResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
+}
 
-
-    $id_imagen = md5( date("Y-m-d H:i:s") . "-" . $data['nombre'] . "-". $data['fabricante']);
-
+function createPlataforma() {
+    global $pdo;
+    
+    $data = getJsonInput();
+    $id_imagen = generateIdImagen();
+    
+    $stmt = $pdo->prepare("INSERT INTO plataformas (nombre, fabricante, id_imagen) VALUES (?, ?, ?)");
     $stmt->execute([
-        $data['nombre'],
-        $data['fabricante'],
+        $data['nombre'] ?? null,
+        $data['fabricante'] ?? null,
         $id_imagen
     ]);
-
-    echo json_encode([
-        "message" => "Plataforma creada",
-        "id" => $id_imagen
-    ]);
-    exit;
+    
+    jsonResponse(["message" => "Plataforma creada", "id" => $id_imagen], 201);
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && $id != null) {
-
-
-    $stmt = $pdo->prepare("SELECT * FROM juegos WHERE id=?");
-    $stmt->execute([$id]);
-    echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-
-    $data = json_decode(file_get_contents("php://input"), true);
-
-    if (!$id) {
-        echo json_encode(["error" => "ID de juego requerido 1"]);
-        exit;
-    }
-
-    $stmt = $pdo->prepare("
-      UPDATE plataformas SET
-      nombre=?, fabricante=?
-      WHERE id=?
-    ");
-
+function updatePlataforma($id) {
+    global $pdo;
+    
+    requireId($id, 'ID de plataforma requerido');
+    $data = getJsonInput();
+    
+    $stmt = $pdo->prepare("UPDATE plataformas SET nombre = ?, fabricante = ? WHERE id = ?");
     $stmt->execute([
-        $data['nombre'],
-        $data['fabricante'],
+        $data['nombre'] ?? null,
+        $data['fabricante'] ?? null,
         $id
     ]);
-
-    echo json_encode(["message" => "Juego actualizado"]);
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-
-    if (!$id) {
-        echo json_encode(["error" => "ID de juego requerido"]);
-        exit;
-    }
     
+    jsonResponse(["message" => "Plataforma actualizada"]);
+}
 
-    $stmt = $pdo->prepare("DELETE FROM plataformas WHERE id=?");
+function deletePlataforma($id) {
+    global $pdo;
+    
+    requireId($id, 'ID de plataforma requerido');
+    
+    $stmt = $pdo->prepare("DELETE FROM plataformas WHERE id = ?");
     $stmt->execute([$id]);
-    echo json_encode(["message" => "Plataforma eliminada"]);
-}
-
-
-
-if (!$id && !$action) {
-
-    $stmt = $pdo->query("SELECT 
-    p.*,
-        COUNT(j.id) AS total,
-        (
-            SELECT archivo 
-            FROM imagenes i 
-            WHERE i.juego_id = p.id_imagen 
-            AND i.tipo = 0 
-            ORDER BY created_at DESC 
-            LIMIT 1
-        ) AS archivo
-    FROM plataformas p
-    LEFT JOIN juegos j ON j.plataforma_id = p.id
-    GROUP BY p.id
-    ORDER BY p.nombre ASC;");
-    $plataformas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-     echo json_encode($plataformas);
-    exit;
-}
-
-
-if (!$id && $action) {
-
-        if($action == 'countPlataformas'){
-            $stmt = $pdo->query("SELECT *,(SELECT count(*) FROM juegos WHERE juegos.plataforma_id = plataformas.id) as total,
-                                (SELECT SUM(juegos.valor) FROM juegos WHERE juegos.plataforma_id = plataformas.id) as totalprecio
-                                FROM 
-                                plataformas 
-                                ORDER BY total DESC");
-            $count =  $stmt->fetchAll(PDO::FETCH_ASSOC);
-            echo json_encode($count);
-            exit;
-        }
-
+    jsonResponse(["message" => "Plataforma eliminada"]);
 }

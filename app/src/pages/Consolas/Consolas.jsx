@@ -1,85 +1,50 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Header from '../../components/Header/Header'
-import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
+import Cards from '../../components/Cards/CardPaginator';
 import Aside from '../../components/Aside/Aside'
-import { Link } from "react-router-dom";
-import { API_URL } from '../../config/api'; 
- 
-export default function Consolas({consolaEditar}) {
+import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
+import SearchFilters from '../../components/SearchFilters/SearchFilters';
+import { API_URL } from '../../config/api';
 
-    const [consolas, setConsolas] = useState([]);
+export default function Consolas() {  
+  const [plataformas, setPlataformas] = useState([]);
+  const [filters, setFilters] = useState({});
 
-    const cargarConsolas = () => {
-        fetch(`${API_URL}/consolas/`)
-        .then(r => r.json())
-        .then(setConsolas);
-    };
+  useEffect(() => {
+    document.title = 'Consolas';
+    fetch(`${API_URL}/plataformas/`)
+      .then(r => r.json())
+      .then(setPlataformas);
+  }, []);
 
-    useEffect(() => {
-        document.title = 'Consolas';
-        cargarConsolas();
-    }, []);
-
-    const eliminarConsola = (e, consola) => {
-        e.preventDefault();
-        if (!window.confirm(`¿Eliminar la consola "${consola.nombre}"?`)) return;
-        
-        fetch(`${API_URL}/consolas/${consola.id}/`, { method: 'DELETE' })
-            .then(r => {
-                if (r.ok) {
-                    cargarConsolas();
-                } else {
-                    alert("Error al eliminar la consola");
-                }
-            });
-    };
-
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+  };
 
   return (
-    <>
-      <div className="container">
-          <Aside consolas={consolas}/>
-          <main className='main'>
-            <Header/>
-            <div className='container-main'>
-              <Breadcrumb items={[    
-                                                        { label: "Consolas", active: true }
-                                                    ]}/>
-              <div className='list-cards'>
-                <div className='game-form'>
-                <h3 className='game-form-title'>Nueva Consola</h3>
-                <p className='game-form-subtitle'>Agrega una nueva consola.</p>
-                  <div className="game-form-action-button">
-                      <Link className='game-form-action-button-save' to="/consolas/edit/"><span className="material-icons">save</span> {consolaEditar ? "Editar Consola" : "Nueva Consola"}</Link>
-                  </div> 
-              </div>
-                <h2 className='list-cards-title'>Listado de Consolas <span></span></h2>
-                  <div className='list-cards-container'>
-                  {consolas.map((consola) => (
-                      <Link to={`/consolas/detalle/${consola.id}/${consola.id_imagen}`} key={consola.id}>
-                        <div className='list-cards-container-card'>
-                          <button 
-                              className="card-delete-btn"
-                              onClick={(e) => eliminarConsola(e, consola)}
-                              title="Eliminar"
-                          >
-                              <span className="material-icons">delete</span>
-                          </button>
-                          <span className='list-cards-container-card-region list-cards-container-card-region--left'>CLP {consola.valor?.toLocaleString()}</span>
-                          <img alt="Game Cover" className="list-cards-container-card-img"  src={consola.archivo? `${API_URL}/imagenes/uploads/${consola.archivo}` : "/img/default-game-cover.png"}></img>
-                            <div className='list-cards-container-card-body'>
-                            
-                            <h3 className='list-cards-container-card-title'>{consola.nombre}</h3>
-                            <p className='list-cards-container-card-plataform'>{consola.plataforma}</p>
-                          </div>
-                        </div> 
-                      </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </main>
-      </div>
-    </>
+    <div className="container">
+      <Aside plataformas={plataformas}/>
+      <main className='main'>
+        <Header/>
+        <div className='container-main'>
+          <Breadcrumb items={[{ label: "Consolas", active: true }]}/>
+          
+          <SearchFilters 
+            onFilterChange={handleFilterChange}
+            plataformas={plataformas}
+          />
+
+          <div className='list-cards'>
+            <h2 className='list-cards-title'>Listado de Consolas <span></span></h2>
+            <Cards 
+              apiEndpoint={`${API_URL}/consolas/`} 
+              onDelete={true}
+              deleteEndpoint={`${API_URL}/consolas/`}
+              filters={filters}
+            />
+          </div>
+        </div>
+      </main>
+    </div>
   );
 }
