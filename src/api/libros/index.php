@@ -65,48 +65,7 @@ function listLibros() {
     
     extract(getPaginationParams());
     
-    $estado = $_GET['estado'] ?? null;
-    $valor_min = $_GET['valor_min'] ?? null;
-    $valor_max = $_GET['valor_max'] ?? null;
-    $anio = $_GET['anio'] ?? null;
-    $orden = $_GET['orden'] ?? 'created_at_desc';
-    
-    $where = [];
-    $params = [];
-    
-    if ($search) {
-        $where[] = "(libros.titulo LIKE :search OR libros.autor LIKE :search)";
-    }
-    if ($estado) {
-        $where[] = "libros.estado = :estado";
-        $params[':estado'] = $estado;
-    }
-    if ($valor_min !== null && $valor_min !== '') {
-        $where[] = "libros.precio >= :valor_min";
-        $params[':valor_min'] = $valor_min;
-    }
-    if ($valor_max !== null && $valor_max !== '') {
-        $where[] = "libros.precio <= :valor_max";
-        $params[':valor_max'] = $valor_max;
-    }
-    if ($anio) {
-        $where[] = "libros.anio = :anio";
-        $params[':anio'] = $anio;
-    }
-    
-    $whereClause = $where ? "WHERE " . implode(" AND ", $where) : "";
-    
-    $orderClause = match($orden) {
-        'titulo_asc' => 'ORDER BY libros.titulo ASC',
-        'titulo_desc' => 'ORDER BY libros.titulo DESC',
-        'valor_asc' => 'ORDER BY libros.precio ASC',
-        'valor_desc' => 'ORDER BY libros.precio DESC',
-        'anio_desc' => 'ORDER BY libros.anio DESC',
-        'calificacion_desc' => 'ORDER BY libros.calificacion DESC',
-        default => 'ORDER BY libros.created_at DESC'
-    };
-    
-    $countSql = "SELECT COUNT(*) as total FROM libros $whereClause";
+    $countSql = "SELECT COUNT(*) as total FROM libros" . ($search ? " WHERE titulo LIKE :search OR autor LIKE :search" : "");
     
     $dataSql = "SELECT 
                 libros.id, 
@@ -119,11 +78,11 @@ function listLibros() {
                 libros.calificacion,
                 libros.precio as valor,
                 (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = libros.id_imagen ORDER BY imagenes.id DESC LIMIT 1) AS portada
-                FROM libros $whereClause 
-                $orderClause 
+                FROM libros" . ($search ? " WHERE libros.titulo LIKE :search OR libros.autor LIKE :search" : "") . " 
+                ORDER BY libros.created_at DESC 
                 LIMIT :limit OFFSET :offset";
     
-    jsonResponse(getPaginatedResponse($pdo, $countSql, $dataSql, $params, $search, $limit, $offset));
+    jsonResponse(getPaginatedResponse($pdo, $countSql, $dataSql, [], $search, $limit, $offset));
 }
 
 function createLibro() {

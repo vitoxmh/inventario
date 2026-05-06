@@ -86,41 +86,10 @@ function listConsolas() {
     
     extract(getPaginationParams());
     
-    $estado = $_GET['estado'] ?? null;
-    $valor_min = $_GET['valor_min'] ?? null;
-    $valor_max = $_GET['valor_max'] ?? null;
-    $orden = $_GET['orden'] ?? 'created_at_desc';
+    $countSql = "SELECT COUNT(*) as total FROM consolas, plataformas 
+                 WHERE consolas.plataforma_id = plataformas.id" . 
+                 ($search ? " AND consolas.nombre LIKE :search" : "");
     
-    $where = ["consolas.plataforma_id = plataformas.id"];
-    $params = [];
-    
-    if ($search) {
-        $where[] = "consolas.nombre LIKE :search";
-    }
-    if ($estado) {
-        $where[] = "consolas.estado = :estado";
-        $params[':estado'] = $estado;
-    }
-    if ($valor_min !== null && $valor_min !== '') {
-        $where[] = "consolas.valor >= :valor_min";
-        $params[':valor_min'] = $valor_min;
-    }
-    if ($valor_max !== null && $valor_max !== '') {
-        $where[] = "consolas.valor <= :valor_max";
-        $params[':valor_max'] = $valor_max;
-    }
-    
-    $whereClause = "WHERE " . implode(" AND ", $where);
-    
-    $orderClause = match($orden) {
-        'nombre_asc' => 'ORDER BY consolas.nombre ASC',
-        'nombre_desc' => 'ORDER BY consolas.nombre DESC',
-        'valor_asc' => 'ORDER BY consolas.valor ASC',
-        'valor_desc' => 'ORDER BY consolas.valor DESC',
-        default => 'ORDER BY consolas.created_at DESC'
-    };
-    
-    $countSql = "SELECT COUNT(*) as total FROM consolas, plataformas $whereClause";
     $dataSql = "SELECT consolas.id, 
                         consolas.plataforma_id, 
                         consolas.id_imagen,
@@ -132,11 +101,12 @@ function listConsolas() {
                         (SELECT archivo FROM imagenes WHERE juego_id = consolas.id_imagen ORDER BY created_at DESC LIMIT 1) AS archivo,
                         plataformas.nombre AS plataforma
                 FROM consolas, plataformas 
-                $whereClause 
-                $orderClause 
+                WHERE consolas.plataforma_id = plataformas.id" . 
+                ($search ? " AND consolas.nombre LIKE :search" : "") . " 
+                ORDER BY consolas.created_at DESC 
                 LIMIT :limit OFFSET :offset";
     
-    jsonResponse(getPaginatedResponse($pdo, $countSql, $dataSql, $params, $search, $limit, $offset));
+    jsonResponse(getPaginatedResponse($pdo, $countSql, $dataSql, [], $search, $limit, $offset));
 }
 
 function createConsola() {

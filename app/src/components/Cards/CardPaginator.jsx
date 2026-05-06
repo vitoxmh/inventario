@@ -2,18 +2,17 @@ import { Link } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import "./CardPaginator.scss";
 import { API_URL } from '../../config/api'; 
- 
+
 export default function Cards({
   apiEndpoint = `${API_URL}/games/`,
   columnas = 4,
   porPagina = 20,
   onDelete = null,
-  deleteEndpoint = null,
-  filters = {}
+  deleteEndpoint = null
 }) {
   const [juegos, setJuegos] = useState([]);
   const [pagina, setPagina] = useState(1);
-  const [busqueda, setBusqueda] = useState(filters.search || "");
+  const [busqueda, setBusqueda] = useState("");
   const [totalPaginas, setTotalPaginas] = useState(0);
   const [loading, setLoading] = useState(false);
 
@@ -22,14 +21,7 @@ export default function Cards({
     const params = new URLSearchParams({
       page: pagina,
       limit: porPagina,
-      ...(busqueda && { search: busqueda }),
-      ...(filters.plataforma_id && { plataforma_id: filters.plataforma_id }),
-      ...(filters.estado && { estado: filters.estado }),
-      ...(filters.valor_min && { valor_min: filters.valor_min }),
-      ...(filters.valor_max && { valor_max: filters.valor_max }),
-      ...(filters.fecha_inicio && { fecha_inicio: filters.fecha_inicio }),
-      ...(filters.fecha_fin && { fecha_fin: filters.fecha_fin }),
-      ...(filters.orden && { orden: filters.orden })
+      ...(busqueda && { search: busqueda })
     });
 
     try {
@@ -42,7 +34,7 @@ export default function Cards({
     } finally {
       setLoading(false);
     }
-  }, [apiEndpoint, pagina, porPagina, busqueda, filters]);
+  }, [apiEndpoint, pagina, porPagina, busqueda]);
 
   useEffect(() => {
     cargarJuegos();
@@ -75,7 +67,7 @@ export default function Cards({
       <div>
         <input
           type="text"
-          placeholder="Buscar..."
+          placeholder="Buscar por título..."
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />

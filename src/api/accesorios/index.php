@@ -65,46 +65,7 @@ function listAccesorios() {
     
     extract(getPaginationParams());
     
-    $estado = $_GET['estado'] ?? null;
-    $valor_min = $_GET['valor_min'] ?? null;
-    $valor_max = $_GET['valor_max'] ?? null;
-    $tipo = $_GET['tipo'] ?? null;
-    $orden = $_GET['orden'] ?? 'created_at_desc';
-    
-    $where = [];
-    $params = [];
-    
-    if ($search) {
-        $where[] = "accesorios.nombre LIKE :search";
-    }
-    if ($estado) {
-        $where[] = "accesorios.estado = :estado";
-        $params[':estado'] = $estado;
-    }
-    if ($valor_min !== null && $valor_min !== '') {
-        $where[] = "accesorios.precio >= :valor_min";
-        $params[':valor_min'] = $valor_min;
-    }
-    if ($valor_max !== null && $valor_max !== '') {
-        $where[] = "accesorios.precio <= :valor_max";
-        $params[':valor_max'] = $valor_max;
-    }
-    if ($tipo) {
-        $where[] = "accesorios.tipo = :tipo";
-        $params[':tipo'] = $tipo;
-    }
-    
-    $whereClause = $where ? "WHERE " . implode(" AND ", $where) : "";
-    
-    $orderClause = match($orden) {
-        'nombre_asc' => 'ORDER BY accesorios.nombre ASC',
-        'nombre_desc' => 'ORDER BY accesorios.nombre DESC',
-        'valor_asc' => 'ORDER BY accesorios.precio ASC',
-        'valor_desc' => 'ORDER BY accesorios.precio DESC',
-        default => 'ORDER BY accesorios.created_at DESC'
-    };
-    
-    $countSql = "SELECT COUNT(*) as total FROM accesorios $whereClause";
+    $countSql = "SELECT COUNT(*) as total FROM accesorios" . ($search ? " WHERE nombre LIKE :search" : "");
     
     $dataSql = "SELECT 
                 accesorios.id, 
@@ -117,11 +78,11 @@ function listAccesorios() {
                 accesorios.precio as valor,
                 (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = accesorios.id_imagen ORDER BY imagenes.id DESC LIMIT 1) AS portada,
                 (SELECT archivo FROM imagenes WHERE tipo = '1' AND imagenes.juego_id = accesorios.id_imagen ORDER BY imagenes.id DESC LIMIT 1) AS fondo    
-                FROM accesorios $whereClause 
-                $orderClause 
+                FROM accesorios" . ($search ? " WHERE accesorios.nombre LIKE :search" : "") . " 
+                ORDER BY accesorios.created_at DESC 
                 LIMIT :limit OFFSET :offset";
     
-    jsonResponse(getPaginatedResponse($pdo, $countSql, $dataSql, $params, $search, $limit, $offset));
+    jsonResponse(getPaginatedResponse($pdo, $countSql, $dataSql, [], $search, $limit, $offset));
 }
 
 function createAccesorio() {

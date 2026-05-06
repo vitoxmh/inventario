@@ -3,12 +3,10 @@ import Header from '../../components/Header/Header'
 import Cards from '../../components/Cards/CardPaginator';
 import Aside from '../../components/Aside/Aside'
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
-import SearchFilters from '../../components/SearchFilters/SearchFilters';
 import { API_URL } from '../../config/api';
 
 export default function Games() {  
   const [plataformas, setPlataformas] = useState([]);
-  const [filters, setFilters] = useState({});
 
   useEffect(() => {
     document.title = 'Juegos';
@@ -17,10 +15,6 @@ export default function Games() {
       .then(setPlataformas);
   }, []);
 
-  const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
-  };
-
   return (
     <div className="container">
       <Aside plataformas={plataformas}/>
@@ -28,19 +22,12 @@ export default function Games() {
         <Header/>
         <div className='container-main'>
           <Breadcrumb items={[{ label: "Juegos", active: true }]}/>
-          
-          <SearchFilters 
-            onFilterChange={handleFilterChange}
-            plataformas={plataformas}
-          />
-
           <div className='list-cards'>
             <h2 className='list-cards-title'>Listado de Juegos <span></span></h2>
             <Cards 
               apiEndpoint={`${API_URL}/games/`} 
               onDelete={true}
               deleteEndpoint={`${API_URL}/games/`}
-              filters={filters}
             />
           </div>
         </div>

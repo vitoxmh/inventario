@@ -64,48 +64,7 @@ function listAmiibos() {
     
     extract(getPaginationParams());
     
-    $estado = $_GET['estado'] ?? null;
-    $valor_min = $_GET['valor_min'] ?? null;
-    $valor_max = $_GET['valor_max'] ?? null;
-    $anio = $_GET['anio'] ?? null;
-    $orden = $_GET['orden'] ?? 'created_at_desc';
-    
-    $where = [];
-    $params = [];
-    
-    if ($search) {
-        $where[] = "amiibos.titulo LIKE :search";
-    }
-    if ($estado) {
-        $where[] = "amiibos.estado = :estado";
-        $params[':estado'] = $estado;
-    }
-    if ($valor_min !== null && $valor_min !== '') {
-        $where[] = "amiibos.precio >= :valor_min";
-        $params[':valor_min'] = $valor_min;
-    }
-    if ($valor_max !== null && $valor_max !== '') {
-        $where[] = "amiibos.precio <= :valor_max";
-        $params[':valor_max'] = $valor_max;
-    }
-    if ($anio) {
-        $where[] = "amiibos.anio = :anio";
-        $params[':anio'] = $anio;
-    }
-    
-    $whereClause = $where ? "WHERE " . implode(" AND ", $where) : "";
-    
-    $orderClause = match($orden) {
-        'titulo_asc' => 'ORDER BY amiibos.titulo ASC',
-        'titulo_desc' => 'ORDER BY amiibos.titulo DESC',
-        'valor_asc' => 'ORDER BY amiibos.precio ASC',
-        'valor_desc' => 'ORDER BY amiibos.precio DESC',
-        'anio_desc' => 'ORDER BY amiibos.anio DESC',
-        'calificacion_desc' => 'ORDER BY amiibos.calificacion DESC',
-        default => 'ORDER BY amiibos.created_at DESC'
-    };
-    
-    $countSql = "SELECT COUNT(*) as total FROM amiibos $whereClause";
+    $countSql = "SELECT COUNT(*) as total FROM amiibos" . ($search ? " WHERE titulo LIKE :search" : "");
     
     $dataSql = "SELECT 
                 amiibos.id, 
@@ -118,11 +77,11 @@ function listAmiibos() {
                 amiibos.calificacion,
                 amiibos.precio as valor,
                 (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.amiibo_id = amiibos.id_imagen ORDER BY imagenes.id DESC LIMIT 1) AS portada
-                FROM amiibos $whereClause 
-                $orderClause 
+                FROM amiibos" . ($search ? " WHERE amiibos.titulo LIKE :search" : "") . " 
+                ORDER BY amiibos.created_at DESC 
                 LIMIT :limit OFFSET :offset";
     
-    jsonResponse(getPaginatedResponse($pdo, $countSql, $dataSql, $params, $search, $limit, $offset));
+    jsonResponse(getPaginatedResponse($pdo, $countSql, $dataSql, [], $search, $limit, $offset));
 }
 
 function createAmiibo() {
