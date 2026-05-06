@@ -16,6 +16,9 @@ function Header({clase = ""}) {
                   <Link to="/" className='header-menu-item'>HOME</Link>
                   <Link to="/games/" className='header-menu-item'>GAMES</Link>
                   <Link to="/consolas/" className='header-menu-item'>Consolas</Link>
+                  <Link to="/amiibos/" className='header-menu-item'>Amiibos</Link>
+                  <Link to="/libros/" className='header-menu-item'>Libros</Link>
+                  <Link to="/accesorios/" className='header-menu-item'>Accesorios</Link>
                   <Link to="/plataformas/" className='header-menu-item'>PLATAFORMA</Link>
                 </nav>
             </div>

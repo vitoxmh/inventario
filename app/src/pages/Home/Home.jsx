@@ -7,9 +7,14 @@ import { useState, useEffect} from "react";
 import './Home.scss'
 
 export default function Home() {
+    useEffect(() => {
+        document.title = 'Inventory';
+    }, []);
 
     const [plataformas, setPlataformas] = useState([]);
     const [lastGame, setLastGame] = useState([]);
+    const [lastConsolas, setLastConsolas] = useState([]);
+    const [lastAmiibos, setLastAmiibos] = useState([]);
 
     useEffect(() => {
         fetch(`${API_URL}/plataformas/?action=countPlataformas`)
@@ -23,6 +28,18 @@ export default function Home() {
         fetch(`${API_URL}/games/?action=last`)
         .then(r => r.json())
         .then(setLastGame);
+    }, []);
+
+    useEffect(() => {
+        fetch(`${API_URL}/consolas/?action=last`)
+        .then(r => r.json())
+        .then(setLastConsolas);
+    }, []);
+
+    useEffect(() => {
+        fetch(`${API_URL}/amiibos/?action=last`)
+        .then(r => r.json())
+        .then(setLastAmiibos);
     }, []);
 
 
@@ -68,11 +85,48 @@ export default function Home() {
                 </Link>
             </div>
             <div className='list-cards'>
-              <h2 className='list-cards-title'>Current Spotlight <span></span></h2>
+              <h2 className='list-cards-title'>Ultimos Juegos <span></span></h2>
               <div className='list-cards-container'>
 
                 {lastGame.map((game) => (
                   <CardGames dataGame={game} key={game.id}/>
+                ))}
+           
+              </div>
+            </div>
+            <div className='list-cards'>
+              <h2 className='list-cards-title'>Ultimas Consolas <span></span></h2>
+              <div className='list-cards-container'>
+
+                {lastConsolas.map((consola) => (
+                  <Link to={`/consolas/detalle/${consola.id}/${consola.id_imagen}`} key={consola.id}>
+                    <div className='list-cards-container-card'>
+                      <span className='list-cards-container-card-region'>{consola.estado}</span>
+                      <img alt="Consola" className="list-cards-container-card-img"  src={consola.archivo? `${API_URL}/imagenes/uploads/${consola.archivo}` : "/img/default-game-cover.png"}></img>
+                      <div className='list-cards-container-card-body'>
+                        <h3 className='list-cards-container-card-title'>{consola.nombre}</h3>
+                        <p className='list-cards-container-card-plataform'>{consola.plataforma}</p>
+                      </div>
+                    </div> 
+                  </Link>
+                ))}
+           
+              </div>
+            </div>
+            <div className='list-cards'>
+              <h2 className='list-cards-title'>Ultimos Amiibos <span></span></h2>
+              <div className='list-cards-container'>
+
+                {lastAmiibos.map((amiibo) => (
+                  <Link to={`/amiibos/detalle/${amiibo.id}/${amiibo.id_imagen}`} key={amiibo.id}>
+                    <div className='list-cards-container-card'>
+                      <img alt="Amiibo" className="list-cards-container-card-img"  src={amiibo.portada? `${API_URL}/imagenes/uploads/${amiibo.portada}` : "/img/default-game-cover.png"}></img>
+                      <div className='list-cards-container-card-body'>
+                        <h3 className='list-cards-container-card-title'>{amiibo.titulo}</h3>
+                        <p className='list-cards-container-card-plataform'>{amiibo.anio}</p>
+                      </div>
+                    </div> 
+                  </Link>
                 ))}
            
               </div>

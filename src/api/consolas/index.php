@@ -5,6 +5,7 @@ require_once '../headers.php';
 
 
 $id = $_GET['id'] ?? null;
+$action = $_GET['action'] ?? null;
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -25,14 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         valor,
         comentario,
         otro,
-        estado,
-        type)
+        estado)
         VALUES (
             ?,
             ?,
             ?, 
             ?, 
-            ?,
             ?,
             ?,
             ?,
@@ -54,8 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data['valor'],
         $data['comentario'],
         $data['otro'],
-        $data['estado'],
-        $data['type']
+        $data['estado']
     ]);
 
     echo json_encode([
@@ -136,19 +134,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
     if (!$id) {
-        echo json_encode(["error" => "ID de juego requerido"]);
+        echo json_encode(["error" => "ID de consolas requerido"]);
         exit;
     }
     
 
-    $stmt = $pdo->prepare("DELETE FROM plataformas WHERE id=?");
+    $stmt = $pdo->prepare("DELETE FROM consolas WHERE id=?");
     $stmt->execute([$id]);
-    echo json_encode(["message" => "Plataforma eliminada"]);
+    echo json_encode(["message" => "Consola eliminada ".$id]);
 }
 
 
 
-if ($id === null) {
+if ($action === 'last') {
+    $stmt = $pdo->query("SELECT 
+                                c.id, 
+                                c.plataforma_id, 
+                                c.id_imagen,
+                                c.nombre,
+                                c.caja,
+                                c.manuales,
+                                c.carton,
+                                c.valor,
+                                c.estado,
+                                p.nombre AS plataforma,
+                                (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = c.id_imagen ORDER BY imagenes.id DESC LIMIT 1 ) AS archivo
+                                FROM consolas c
+                                JOIN plataformas p ON c.plataforma_id = p.id
+                                ORDER BY c.created_at DESC
+                                LIMIT 10");
+    $consolas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode($consolas);
+    exit;
+}
+
+if ($id === null && !$action) {
 
     $stmt = $pdo->query("SELECT 
                                 consolas.id, 

@@ -12,21 +12,23 @@ export default function EditarGame() {
     const [imagenes, setImagenes] = useState([]);
 
 
-    useEffect(() => {
+useEffect(() => {
         // Juego
         fetch(`${API_URL}/games/?id=${id}`)
         .then(r => r.json())
-        .then(setJuego);
+        .then((data) => {
+            setJuego(data);
+            document.title = `Editar ${data.titulo}`;
+        });
 
 
             // Imágenes
-        fetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
-        .then(r => r.json())
-        .then(setImagenes);
+    fetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
+    .then(r => r.json())
+    .then(setImagenes);
 
 
-
-    }, [id]);
+}, [id]);
 
 
 

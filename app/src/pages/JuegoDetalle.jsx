@@ -13,18 +13,20 @@ export default function JuegoDetalle() {
   const [juego, setJuego] = useState(null);
   const [imagenes, setImagenes] = useState([]);
 
-  useEffect(() => {
+useEffect(() => {
     // Juego
     fetch(`${API_URL}/games/?id=${id}`)
       .then(r => r.json())
-      .then(setJuego);
+      .then((data) => {
+        setJuego(data);
+        document.title = data.titulo || 'Detalle Juego';
+      });
 
 
         // Imágenes
     fetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=4`)
       .then(r => r.json())
       .then(setImagenes);
-
 
 
   }, [id]);

@@ -16,8 +16,23 @@ export default function Consolas({consolaEditar}) {
     };
 
     useEffect(() => {
+        document.title = 'Consolas';
         cargarConsolas();
     }, []);
+
+    const eliminarConsola = (e, consola) => {
+        e.preventDefault();
+        if (!window.confirm(`¿Eliminar la consola "${consola.nombre}"?`)) return;
+        
+        fetch(`${API_URL}/consolas/${consola.id}/`, { method: 'DELETE' })
+            .then(r => {
+                if (r.ok) {
+                    cargarConsolas();
+                } else {
+                    alert("Error al eliminar la consola");
+                }
+            });
+    };
 
 
   return (
@@ -39,20 +54,26 @@ export default function Consolas({consolaEditar}) {
                   </div> 
               </div>
                 <h2 className='list-cards-title'>Listado de Consolas <span></span></h2>
-                <div className='list-cards-container'>
+                  <div className='list-cards-container'>
                   {consolas.map((consola) => (
-                    <Link to={`/consolas/detalle/${consola.id}/${consola.id_imagen}`} key={consola.id}>
-                      <div className='list-cards-container-card'>
-                        
-                        <span className='list-cards-container-card-region'>Total juegos: {consola.total}</span>
-                        <img alt="Game Cover" className="list-cards-container-card-img"  src={consola.archivo? `${API_URL}/imagenes/uploads/${consola.archivo}` : "/img/default-game-cover.png"}></img>
-                        <div className='list-cards-container-card-body'>
-                          
-                          <h3 className='list-cards-container-card-title'>{consola.nombre}</h3>
-                          <p className='list-cards-container-card-plataform'>{consola.fabricante} • {consola.lanzamiento}</p>
-                        </div>
-                      </div> 
-                    </Link>
+                      <Link to={`/consolas/detalle/${consola.id}/${consola.id_imagen}`} key={consola.id}>
+                        <div className='list-cards-container-card'>
+                          <button 
+                              className="card-delete-btn"
+                              onClick={(e) => eliminarConsola(e, consola)}
+                              title="Eliminar"
+                          >
+                              <span className="material-icons">delete</span>
+                          </button>
+                          <span className='list-cards-container-card-region list-cards-container-card-region--left'>CLP {consola.valor?.toLocaleString()}</span>
+                          <img alt="Game Cover" className="list-cards-container-card-img"  src={consola.archivo? `${API_URL}/imagenes/uploads/${consola.archivo}` : "/img/default-game-cover.png"}></img>
+                            <div className='list-cards-container-card-body'>
+                            
+                            <h3 className='list-cards-container-card-title'>{consola.nombre}</h3>
+                            <p className='list-cards-container-card-plataform'>{consola.plataforma}</p>
+                          </div>
+                        </div> 
+                      </Link>
                   ))}
                 </div>
               </div>

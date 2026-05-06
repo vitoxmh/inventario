@@ -104,7 +104,6 @@ if (!$id && !$action) {
     FROM plataformas p
     LEFT JOIN juegos j ON j.plataforma_id = p.id
     GROUP BY p.id
-    HAVING total > 0
     ORDER BY p.nombre ASC;");
     $plataformas = $stmt->fetchAll(PDO::FETCH_ASSOC);
      echo json_encode($plataformas);

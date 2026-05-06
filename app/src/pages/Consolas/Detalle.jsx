@@ -26,7 +26,10 @@ export default function Detalle() {
         // consola
         fetch(`${API_URL}/consolas/?id=${id}`)
         .then(r => r.json())
-        .then(setConsola);
+        .then((data) => {
+            setConsola(data);
+            document.title = data.nombre || 'Detalle Consola';
+        });
 
     }, [id, id_imagen]);
 

@@ -4,6 +4,14 @@
 
     position: relative;
     margin-top: 30px;
+
+    &-logo{
+        max-width: 150px;
+        max-height: 100px;
+        object-fit: contain;
+        margin-bottom: 10px;
+    }
+
     &-title{
         color: rgb(255 255 255);
         font-size: 3rem;
@@ -12,6 +20,7 @@
         text-transform: uppercase;
         font-weight: 700;
         margin: 15px 0;
+        width: 78%;
 
         span{
             color: rgb(0 194 162);
@@ -26,6 +35,24 @@
         font-weight: 500;
         font-size: 1.125rem;
         line-height: 1.75rem;
+    }
+
+    &-stars{
+        display: flex;
+        gap: 0.25rem;
+        margin-bottom: 0.5rem;
+
+        .material-icons{
+            font-size: 1.5rem;
+        }
+
+        .star-filled{
+            color: #fbbf24;
+        }
+
+        .star-empty{
+            color: rgb(148 163 184);
+        }
     }
 
     &-price{
@@ -186,6 +213,7 @@
   padding: 20px;
   border-radius: 0x;
   min-height: 100%;
+  position: relative;
 }
 
 .detalle-juego-comentario {
@@ -234,4 +262,21 @@
         cursor: pointer;
     }
     
+}
+
+
+.logo-juego{
+   width: 241px;
+  height: 66px;
+  object-fit: contain;
+  margin-bottom: 10px;
+  position: absolute;
+  right: 0;
+  top: -70px;
+  text-align: center;
+
+  img{
+    width: auto;
+    height: 66px;
+  }
 }

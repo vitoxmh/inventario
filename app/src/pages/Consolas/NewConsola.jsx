@@ -7,8 +7,9 @@ import { Link } from "react-router-dom";
 import { API_URL } from '../../config/api'; 
  
 export default function NewConsola() {
-
-
+  useEffect(() => {
+    document.title = 'Nueva Consola';
+  }, []);
   return (
     <>
       <div className="container">

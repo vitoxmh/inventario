@@ -18,7 +18,8 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
         genero: "",
         region: "",
         publicador: "",
-        comentario: ""
+        comentario: "",
+        puntuacion: 0
     });
 
     const estadoOptions = ["Nuevo", "Usado - Excelente", "Usado - Bueno", "Usado - Aceptable"];
@@ -27,11 +28,13 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
     const [contraportada, setContraportada] = useState(null);
     const [galeria, setGaleria] = useState(null);
     const [poster, setPoster] = useState(null);
+    const [logo, setLogo] = useState(null);
 
     const portadaInputRef = useRef(null);
     const contraportadaInputRef = useRef(null);
     const galeriaInputRef = useRef(null);
     const posterInputRef = useRef(null);
+    const logoInputRef = useRef(null);
 
     const generosVideojuegos = [
         "Acción",
@@ -111,7 +114,8 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
                 genero: juegoEditar.genero || "",
                 region: juegoEditar.region || "",
                 publicador: juegoEditar.publicador || "",
-                comentario: juegoEditar.comentario || ""
+                comentario: juegoEditar.comentario || "",
+                puntuacion: juegoEditar.puntuacion || 0
             });
 
              // Cargar imágenes si vienen del juego
@@ -119,6 +123,7 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
             setContraportada(imagenesEditar.filter(img => img.tipo === '1').at(-1) || null);
             setGaleria(imagenesEditar.filter(img => img.tipo === '4') || []);
             setPoster(imagenesEditar.filter(img => img.tipo === '2').at(-1) || null);
+            setLogo(imagenesEditar.filter(img => img.tipo === '3').at(-1) || null);
     }
     }, [juegoEditar, imagenesEditar]);
 
@@ -254,6 +259,21 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
                 });
 
                 if (!imgRes.ok) throw new Error("Error al subir imágenes");
+        }
+
+        if (logo) {
+
+            const fd = new FormData();
+            fd.append("imagenes[]", logo);
+            fd.append("juego_id", juegoId);
+            fd.append("tipo", '3');
+
+                const imgRes = await fetch(`${API_URL}/imagenes/`, {
+                    method: "POST",
+                    body: fd
+                });
+
+                if (!imgRes.ok) throw new Error("Error al subir logo");
         }
 
 
@@ -474,6 +494,21 @@ return (
                                 rows="3"
                             />
                         </div>
+                        <div className='game-form-100'>
+                            <label className='game-form-label'>Puntuación</label>
+                            <div className='game-form-stars'>
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <button
+                                        key={star}
+                                        type="button"
+                                        className={`game-form-star-btn ${form.puntuacion >= star ? 'active' : ''}`}
+                                        onClick={() => setForm({ ...form, puntuacion: star })}
+                                    >
+                                        <span className="material-icons">{form.puntuacion >= star ? 'star' : 'star_border'}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -578,6 +613,27 @@ return (
 
                         <input type="file" accept="image/*" ref={posterInputRef} style={{display:'none'}}
                             onChange={(e)=>handleSelect(e,setPoster)}
+                        />
+                    </div>
+
+                    <h4 className='game-form-data-title game-form-100 game-form-data-title--white'>Logo</h4>
+                    <div className='game-form-drop-image game-form-100 drop-area'
+                        onDrop={(e)=>handleDrop(e,setLogo)} 
+                        onDragOver={(e)=>e.preventDefault()}
+                        onClick={()=>logoInputRef.current.click()}
+                    >
+
+                        {logo && logo !== null ? (
+                            <img src={getImageSrc(logo)} alt="logo" className="game-form-drop-image-prev" />
+                        ) : (
+                        <>
+                            <span className="material-icons game-form-drop-image-icono">image</span>
+                            <p className="game-form-drop-image-text">Logo Image</p>
+                        </>
+                        )}
+
+                        <input type="file" accept="image/*" ref={logoInputRef} style={{display:'none'}}
+                            onChange={(e)=>handleSelect(e,setLogo)}
                         />
                     </div>
                 </div>

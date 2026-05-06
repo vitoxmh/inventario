@@ -1,5 +1,5 @@
 .sidebar{
-position: fixed;
+	position: fixed;
   top: 0;
   left: 0;
   width: 288px;
@@ -10,6 +10,18 @@ position: fixed;
 
   &-detalle-juego{
 	margin-top: 62px;
+  }
+
+  &-logo-container{
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+  }
+
+  &-logo-img{
+    max-width: 120px;
+    max-height: 80px;
+    object-fit: contain;
   }
 
   &-imagen-principal{
@@ -225,4 +237,108 @@ position: fixed;
 
 .img-hover:hover .img-hover-main {
   opacity: 0;
+}
+
+.sidebar-card {
+    position: relative;
+    overflow: hidden;
+    height: 387px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    background: #1a1a1a;
+    
+    &-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+    
+    &-img-vacio {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        .material-icons {
+            font-size: 80px;
+            color: #333;
+        }
+    }
+    
+    &-info {
+        margin-top: 10px;
+    }
+    
+    &-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background: #1a1a1a;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        
+        .material-icons {
+            font-size: 18px;
+            color: #00a294;
+        }
+        
+        span {
+            color: #fff;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+    }
+}
+
+.sidebar-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px;
+    background: #00a294;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    margin-bottom: 10px;
+    
+    &:hover {
+        background: #008577;
+    }
+    
+    .material-icons {
+        font-size: 20px;
+    }
+}
+
+.sidebar-btn-delete {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px;
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    
+    &:hover {
+        background: #dc2626;
+    }
+    
+    .material-icons {
+        font-size: 20px;
+    }
 }

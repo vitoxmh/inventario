@@ -13,11 +13,14 @@ export default function EditConsola() {
   const [imagenes, setImagenes] = useState([]);
   const { id, id_imagen } = useParams();
 
- useEffect(() => {
+useEffect(() => {
 
-     fetch(`${API_URL}/consolas/?id=${id}`)
+      fetch(`${API_URL}/consolas/?id=${id}`)
             .then(r => r.json())
-            .then(setConsola);
+            .then((data) => {
+                setConsola(data);
+                document.title = `Editar ${data.nombre}`;
+            });
 
 
       fetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)

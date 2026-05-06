@@ -15,20 +15,27 @@ export default function DetalleJuego() {
     const [portada, setPortada] = useState(null);
     const [contraportada, setContraportada] = useState(null);
     const [galeria, setGaleria] = useState([]);
+    const [logo, setLogo] = useState(null);
     const dialogRef = useRef(null);
   
     useEffect(() => {
-    
-            // Galeria
+        // Galeria
         fetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
         .then(r => r.json())
-        .then(setGaleria);
+        .then((data) => {
+            setGaleria(data);
+            const logoImg = data.find(img => img.tipo === "3");
+            if (logoImg) setLogo(logoImg);
+        });
 
 
         // Juego
         fetch(`${API_URL}/games/?id=${id}`)
         .then(r => r.json())
-        .then(setJuego);
+        .then((data) => {
+            setJuego(data);
+            document.title = data.titulo || 'Detalle Juego';
+        });
 
     }, [id, id_imagen]);
 
@@ -72,15 +79,16 @@ export default function DetalleJuego() {
             <Header clase="header-detalle-juego" />
             <main className='main'>
                  <AsideGame clase={"sidebar-detalle-juego"}
-                 section={"/editar-juego"} 
-                 imgPortada={juego.portada}
-                 imgContraportada={juego.contraportada}
-                 cartucho={juego.cartucho}
-                 manual={juego.manual} 
-                 caja={juego.caja}
-                 id={juego.id_juego}
-                 id_imagen={juego.id_imagen_games}
-                 />
+                  section={"/editar-juego"} 
+                  imgPortada={juego.portada}
+                  imgContraportada={juego.contraportada}
+                  imgLogo={juego.logo}
+                  cartucho={juego.cartucho}
+                  manual={juego.manual} 
+                  caja={juego.caja}
+                  id={juego.id_juego}
+                  id_imagen={juego.id_imagen_games}
+                  />
                  <div className='container-main' style={juego.poster ? { 
                         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.95) 30%), url(${API_URL}/imagenes/uploads/${juego.poster})`, 
                         backgroundSize: 'cover', 
@@ -93,7 +101,22 @@ export default function DetalleJuego() {
                                             { label: juego.titulo, active: true }
                                         ]}/>
                     <div className="detalle-juego">
+                       
                         <h3 className="detalle-juego-title"><span>{juego.desarrollador}</span>{juego.titulo}</h3>
+                        {juego.logo && (
+                            <div className="logo-juego">
+                                <img src={`${API_URL}/imagenes/uploads/${juego.logo}`} alt="Logo"  />
+                            </div>
+                        )}
+                        {juego.puntuacion > 0 && (
+                            <div className='detalle-juego-stars'>
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <span key={star} className={`material-icons ${juego.puntuacion >= star ? 'star-filled' : 'star-empty'}`}>
+                                        {juego.puntuacion >= star ? 'star' : 'star_border'}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
                         <p className='detalle-juego-description'>Estado: {juego.estado}</p>
                         <div className="detalle-juego-price">
                             <p className="detalle-juego-price-title">Est. Market Value</p>

@@ -34,7 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         desarrollador,
         genero,
         publicador,
-        comentario)
+        comentario,
+        puntuacion)
         VALUES (
             ?, 
             ?, 
@@ -47,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ?, 
             ?, 
             ?, 
+            ?,
             ?,
             ?,
             ?,
@@ -73,7 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data['desarrollador'] ?? null,
         $data['genero'] ?? null,
         $data['publicador'] ?? null,
-        $data['comentario'] ?? null
+        $data['comentario'] ?? null,
+        $data['puntuacion'] ?? null
     ]);
 
     echo json_encode([
@@ -103,13 +106,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $id != null) {
     juegos.lanzamiento, 
     juegos.plataforma_id,
     juegos.comentario,
-    plataformas.nombre as plataforma, 
+    juegos.puntuacion,
+    plataformas.nombre as plataforma,
     juegos.id as id_juego, 
     juegos.id_imagen as id_imagen_games,
     (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1 ) AS portada,
     (SELECT archivo FROM imagenes WHERE tipo = '1' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1 ) AS contraportada,
-    (SELECT archivo FROM imagenes WHERE tipo = '2' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1 ) AS poster  
-    FROM juegos, plataformas 
+    (SELECT archivo FROM imagenes WHERE tipo = '2' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1 ) AS poster,
+    (SELECT archivo FROM imagenes WHERE tipo = '3' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1 ) AS logo  
+    FROM juegos, plataformas
     WHERE juegos.plataforma_id = plataformas.id 
     AND juegos.id =?");
     $stmt->execute([$id]);
@@ -143,7 +148,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
       desarrollador=?,
       genero=?,
       publicador=?,
-      comentario=?
+      comentario=?,
+      puntuacion=?
       WHERE id=?
     ");
 
@@ -162,6 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         $data['genero'],
         $data['publicador'],
         $data['comentario'] ?? null,
+        $data['puntuacion'] ?? null,
         $id
     ]);
 
@@ -183,18 +190,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
 if (!$id && !$action) {
 
-    $stmt = $pdo->query("SELECT 
-                                juegos.id, 
-                                juegos.titulo, 
-                                juegos.id_imagen, 
-                                juegos.valor, 
-                                juegos.region,
-                                (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1 ) AS portada, 
-                                plataformas.nombre as plataforma 
-                                FROM juegos, plataformas 
-                                WHERE juegos.plataforma_id = plataformas.id ORDER BY juegos.created_at DESC");
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
+    $search = isset($_GET['search']) ? $_GET['search'] : '';
+    
+    $page = max(1, $page);
+    $limit = max(1, min(100, $limit));
+    $offset = ($page - 1) * $limit;
+
+    $countStmt = $pdo->prepare("SELECT COUNT(*) as total FROM juegos, plataformas WHERE juegos.plataforma_id = plataformas.id" . ($search ? " AND juegos.titulo LIKE :search" : ""));
+    if ($search) {
+        $countStmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+    }
+    $countStmt->execute();
+    $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+    $sql = "SELECT 
+                juegos.id, 
+                juegos.titulo, 
+                juegos.id_imagen, 
+                juegos.valor, 
+                juegos.region,
+                (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1 ) AS portada, 
+                plataformas.nombre as plataforma 
+                FROM juegos, plataformas 
+                WHERE juegos.plataforma_id = plataformas.id" . ($search ? " AND juegos.titulo LIKE :search" : "") . " ORDER BY juegos.created_at DESC LIMIT :limit OFFSET :offset";
+    
+    $stmt = $pdo->prepare($sql);
+    if ($search) {
+        $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+    }
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
     $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
-     echo json_encode($games);
+
+    echo json_encode([
+        'data' => $games,
+        'pagination' => [
+            'page' => $page,
+            'limit' => $limit,
+            'total' => (int)$total,
+            'totalPages' => ceil($total / $limit)
+        ]
+    ]);
     exit;
 }
 
@@ -222,8 +261,23 @@ if (!$id && $action) {
 
     }else  if($action == 'all-plataforma'){
 
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
+        $search = isset($_GET['search']) ? $_GET['search'] : '';
+        
+        $page = max(1, $page);
+        $limit = max(1, min(100, $limit));
+        $offset = ($page - 1) * $limit;
 
-      
+        $countSql = "SELECT COUNT(*) as total FROM juegos, plataformas WHERE juegos.plataforma_id = plataformas.id AND juegos.plataforma_id = :id_plataforma" . ($search ? " AND juegos.titulo LIKE :search" : "");
+        $countStmt = $pdo->prepare($countSql);
+        $countStmt->bindValue(':id_plataforma', $id_plataforma, PDO::PARAM_INT);
+        if ($search) {
+            $countStmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+        }
+        $countStmt->execute();
+        $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+
         $sql = "SELECT  juegos.id, 
                         juegos.titulo, 
                         juegos.id_imagen, 
@@ -236,17 +290,34 @@ if (!$id && $action) {
                          (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1 ) AS archivo 
                 FROM juegos, plataformas 
                 WHERE juegos.plataforma_id = plataformas.id 
-                AND juegos.plataforma_id = ? 
+                AND juegos.plataforma_id = :id_plataforma" . ($search ? " AND juegos.titulo LIKE :search" : "") . " 
                 ORDER BY juegos.created_at 
-                DESC;";
+                DESC LIMIT :limit OFFSET :offset";
         $stmt = $pdo->prepare($sql);
-                 $stmt->execute([$id_plataforma]);
-    
+        $stmt->bindValue(':id_plataforma', $id_plataforma, PDO::PARAM_INT);
+        if ($search) {
+            $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+        }
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        echo json_encode([
+            'data' => $games,
+            'pagination' => [
+                'page' => $page,
+                'limit' => $limit,
+                'total' => (int)$total,
+                'totalPages' => ceil($total / $limit)
+            ]
+        ]);
+        exit;
     }
 
    
-     $count = $stmt->fetchAll(PDO::FETCH_ASSOC);
-     echo json_encode($count);
+     $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
+     echo json_encode($games);
     exit;
 
 

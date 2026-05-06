@@ -16,8 +16,23 @@ export default function Plataformas() {
     };
 
     useEffect(() => {
+        document.title = 'Plataformas';
         cargarPlataformas();
     }, []);
+
+    const eliminarPlataforma = (e, plataforma) => {
+        e.preventDefault();
+        if (!window.confirm(`¿Eliminar la plataforma "${plataforma.nombre}"? Esto eliminará todos los juegos asociados.`)) return;
+        
+        fetch(`${API_URL}/plataformas/${plataforma.id}/`, { method: 'DELETE' })
+            .then(r => {
+                if (r.ok) {
+                    cargarPlataformas();
+                } else {
+                    alert("Error al eliminar la plataforma");
+                }
+            });
+    };
 
 
   return (
@@ -32,11 +47,17 @@ export default function Plataformas() {
                                                     ]}/>
               <div className='list-cards'>
                 <h2 className='list-cards-title'>Listado de Plataformas <span></span></h2>
-                <div className='list-cards-container'>
+<div className='list-cards-container'>
                   {plataformas.map((plataforma) => (
                     <Link to={`/detalle-plataforma/${plataforma.id}/`} key={plataforma.id}>
                       <div className='list-cards-container-card'>
-                        
+                        <button 
+                            className="card-delete-btn"
+                            onClick={(e) => eliminarPlataforma(e, plataforma)}
+                            title="Eliminar"
+                        >
+                            <span className="material-icons">delete</span>
+                        </button>
                         <span className='list-cards-container-card-region'>Total juegos: {plataforma.total}</span>
                         <img alt="Game Cover" className="list-cards-container-card-img"  src={plataforma.archivo? `${API_URL}/imagenes/uploads/${plataforma.archivo}` : "/img/default-game-cover.png"}></img>
                         <div className='list-cards-container-card-body'>

@@ -12,8 +12,15 @@ export default function Aside({clase = "", plataformas = []}) {
             <a href="#" className='nav-item'><i className="material-icons">star</i>Favoritos</a>
             <a href="#" className='nav-item'><i className="material-icons">schedule</i>Recien Agregado</a>
          </nav> 
-         <p className='nav-text'>Hardware</p>
-         <nav className='nav nav-platforms mt-20'>
+<p className='nav-text'>Biblioteca</p>
+          <nav className='nav nav-platforms mt-20'>
+             <a href="/libros/" className='nav-item'><i className="material-icons">book</i>Libros</a>
+             <a href="/libros/nuevo/" className='nav-item'><i className="material-icons">add</i>Agregar Libro</a>
+             <a href="/accesorios/" className='nav-item'><i className="material-icons">sports_esports</i>Accesorios</a>
+             <a href="/accesorios/nuevo/" className='nav-item'><i className="material-icons">add</i>Agregar Accesorio</a>
+          </nav>
+          <p className='nav-text'>Hardware</p>
+          <nav className='nav nav-platforms mt-20'>
             
             {plataformas.map((plataforma) => (
                 <a key={plataforma.id} href={`/detalle-plataforma/${plataforma.id}`} className='nav-item'>

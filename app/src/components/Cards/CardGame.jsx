@@ -16,6 +16,15 @@ export default function CardGames({dataGame =null}) {
                       </div>
                       <h3 className='list-cards-container-card-title'>{dataGame.titulo}</h3>
                       <p className='list-cards-container-card-plataform'>{dataGame.plataforma} • {dataGame.lanzamiento}</p>
+                      {dataGame.puntuacion > 0 && (
+                        <div className='list-cards-container-card-stars'>
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <span key={star} className={`material-icons ${dataGame.puntuacion >= star ? 'star-filled' : 'star-empty'}`}>
+                              {dataGame.puntuacion >= star ? 'star' : 'star_border'}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div> 
         </Link>
