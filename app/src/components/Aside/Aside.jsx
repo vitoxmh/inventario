@@ -9,7 +9,7 @@ export default function Aside({clase = "", plataformas = []}) {
          <nav className='nav'>
             <p className='nav-text'>Libreria</p>
             <a href="#" className='nav-all'><i className="material-icons">inventory_2</i>Toda la colección <span>1,246</span></a>
-            <a href="#" className='nav-item'><i className="material-icons">star</i>Favoritos</a>
+             <a href="/favoritos/" className='nav-item'><i className="material-icons">star</i>Favoritos</a>
             <a href="#" className='nav-item'><i className="material-icons">schedule</i>Recien Agregado</a>
          </nav> 
 <p className='nav-text'>Biblioteca</p>

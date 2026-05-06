@@ -16,6 +16,7 @@ export default function DetalleJuego() {
     const [contraportada, setContraportada] = useState(null);
     const [galeria, setGaleria] = useState([]);
     const [logo, setLogo] = useState(null);
+    const [favorito, setFavorito] = useState(false);
     const dialogRef = useRef(null);
   
     useEffect(() => {
@@ -34,10 +35,27 @@ export default function DetalleJuego() {
         .then(r => r.json())
         .then((data) => {
             setJuego(data);
+            setFavorito(data.favorito || false);
             document.title = data.titulo || 'Detalle Juego';
         });
 
     }, [id, id_imagen]);
+
+    const toggleFavorito = async () => {
+        try {
+            const res = await fetch(`${API_URL}/games/${id}/`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...juego, favorito: !favorito })
+            });
+            if (res.ok) {
+                setFavorito(!favorito);
+                setJuego({ ...juego, favorito: !favorito });
+            }
+        } catch (error) {
+            console.error('Error al actualizar favorito:', error);
+        }
+    };
 
 
     
@@ -102,21 +120,32 @@ export default function DetalleJuego() {
                                         ]}/>
                     <div className="detalle-juego">
                        
-                        <h3 className="detalle-juego-title"><span>{juego.desarrollador}</span>{juego.titulo}</h3>
-                        {juego.logo && (
-                            <div className="logo-juego">
-                                <img src={`${API_URL}/imagenes/uploads/${juego.logo}`} alt="Logo"  />
-                            </div>
-                        )}
-                        {juego.puntuacion > 0 && (
-                            <div className='detalle-juego-stars'>
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                    <span key={star} className={`material-icons ${juego.puntuacion >= star ? 'star-filled' : 'star-empty'}`}>
-                                        {juego.puntuacion >= star ? 'star' : 'star_border'}
-                                    </span>
-                                ))}
-                            </div>
-                        )}
+                        <div className="detalle-juego-title-container">
+                            <h3 className="detalle-juego-title"><span>{juego.desarrollador}</span>{juego.titulo}</h3>
+                            <button 
+                                className={`detalle-juego-favorito-btn ${favorito ? 'active' : ''}`}
+                                onClick={toggleFavorito}
+                                title={favorito ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+                            >
+                                <span className="material-icons">
+                                    {favorito ? 'favorite' : 'favorite_border'}
+                                </span>
+                            </button>
+                        </div>
+                         {juego.logo && (
+                             <div className="logo-juego">
+                                 <img src={`${API_URL}/imagenes/uploads/${juego.logo}`} alt="Logo"  />
+                             </div>
+                         )}
+                         {juego.puntuacion > 0 && (
+                             <div className='detalle-juego-stars'>
+                                 {[1, 2, 3, 4, 5].map((star) => (
+                                     <span key={star} className={`material-icons ${juego.puntuacion >= star ? 'star-filled' : 'star-empty'}`}>
+                                         {juego.puntuacion >= star ? 'star' : 'star_border'}
+                                     </span>
+                                 ))}
+                             </div>
+                         )}
                         <p className='detalle-juego-description'>Estado: {juego.estado}</p>
                         <div className="detalle-juego-price">
                             <p className="detalle-juego-price-title">Est. Market Value</p>

@@ -25,7 +25,8 @@ import Accesorios from './pages/Accesorios/Accesorios';
 import NewAccesorio from './pages/Accesorios/NewAccesorio';
 import DetalleAccesorio from './pages/Accesorios/DetalleAccesorio';
 import EditAccesorio from './pages/Accesorios/EditAccesorio';
-  
+import Favoritos from './pages/Favoritos/Favoritos';
+   
 function App() {
 
   return (
@@ -56,6 +57,7 @@ function App() {
           <Route path="/accesorios/nuevo/" element={<NewAccesorio />} />
           <Route path="/accesorios/detalle/:id/:id_imagen/" element={<DetalleAccesorio />} />
           <Route path="/accesorios/editar/:id/:id_imagen/" element={<EditAccesorio />} />
+          <Route path="/favoritos/" element={<Favoritos />} />
         </Routes>
       </BrowserRouter>
     </>

@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import './CardGames.scss'
 import { API_URL } from '../../config/api'; 
+import { useState } from 'react';
 
 export default function CardGames({dataGame =null}) {
+    const [favorito, setFavorito] = useState(dataGame.favorito || false);
     const formatPrice = (price) => {
         if (!price) return '';
         return new Intl.NumberFormat("es-CL", {
@@ -10,6 +12,22 @@ export default function CardGames({dataGame =null}) {
             currency: "CLP",
             minimumFractionDigits: 0
         }).format(price);
+    };
+
+    const toggleFavorito = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await fetch(`${API_URL}/games/${dataGame.id}/`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...dataGame, favorito: !favorito })
+            });
+            if (res.ok) {
+                setFavorito(!favorito);
+            }
+        } catch (error) {
+            console.error('Error al actualizar favorito:', error);
+        }
     };
 
     return (
@@ -21,6 +39,15 @@ export default function CardGames({dataGame =null}) {
                             {dataGame.estado}
                         </span>
                     )}
+                    <button 
+                        className={`card-favorito-btn ${favorito ? 'active' : ''}`}
+                        onClick={toggleFavorito}
+                        title={favorito ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+                    >
+                        <span className="material-icons">
+                            {favorito ? 'favorite' : 'favorite_border'}
+                        </span>
+                    </button>
                     <img 
                         alt="Game Cover" 
                         className="list-cards-container-card-img"  

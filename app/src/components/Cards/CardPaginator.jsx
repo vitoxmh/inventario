@@ -16,6 +16,27 @@ export default function Cards({
   const [totalPaginas, setTotalPaginas] = useState(0);
   const [loading, setLoading] = useState(false);
 
+  const toggleFavorito = async (e, item) => {
+    e.preventDefault();
+    if (type !== 'juego') return;
+    
+    try {
+      const nuevoEstado = !item.favorito;
+      const res = await fetch(`${API_URL}/games/${item.id}/`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...item, favorito: nuevoEstado })
+      });
+      if (res.ok) {
+        setItems(items.map(i => 
+          i.id === item.id ? { ...i, favorito: nuevoEstado } : i
+        ));
+      }
+    } catch (error) {
+      console.error('Error al actualizar favorito:', error);
+    }
+  };
+
   const cargarItems = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams({
@@ -24,8 +45,11 @@ export default function Cards({
       ...(busqueda && { search: busqueda })
     });
 
+    const separator = apiEndpoint.includes('?') ? '&' : '?';
+    const url = `${apiEndpoint}${separator}${params}`;
+
     try {
-      const resp = await fetch(`${apiEndpoint}?${params}`);
+      const resp = await fetch(url);
       const data = await resp.json();
       setItems(data.data || []);
       setTotalPaginas(data.pagination?.totalPages || 0);
@@ -90,6 +114,17 @@ export default function Cards({
     return (
       <Link to={getDetalleUrl(item)} key={item.id}>
         <div className="list-cards-container-card">
+          {isJuego && (
+            <button 
+              className={`card-favorito-btn ${item.favorito ? 'active' : ''}`}
+              onClick={(e) => toggleFavorito(e, item)}
+              title={item.favorito ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+            >
+              <span className="material-icons">
+                {item.favorito ? 'favorite' : 'favorite_border'}
+              </span>
+            </button>
+          )}
           {onDelete && (
             <button 
               className="card-delete-btn"
