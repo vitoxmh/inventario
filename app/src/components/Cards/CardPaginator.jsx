@@ -5,7 +5,7 @@ import { API_URL } from '../../config/api';
 
 export default function Cards({
   apiEndpoint = `${API_URL}/games/`,
-  type = "juego", // "juego", "consola", "libro", "amiibo"
+  type = "juego",
   porPagina = 20,
   onDelete = null,
   deleteEndpoint = null
@@ -39,14 +39,15 @@ export default function Cards({
 
   const cargarItems = useCallback(async () => {
     setLoading(true);
-    const params = new URLSearchParams({
-      page: pagina,
-      limit: porPagina,
-      ...(busqueda && { search: busqueda })
-    });
+    const params = new URLSearchParams();
+    params.append('page', pagina);
+    params.append('limit', porPagina);
+    if (busqueda) {
+      params.append('search', busqueda);
+    }
 
     const separator = apiEndpoint.includes('?') ? '&' : '?';
-    const url = `${apiEndpoint}${separator}${params}`;
+    const url = `${apiEndpoint}${separator}${params.toString()}`;
 
     try {
       const resp = await fetch(url);
@@ -157,6 +158,53 @@ export default function Cards({
     );
   };
 
+  const renderPagination = () => {
+    if (totalPaginas <= 1) return null;
+
+    const pages = [];
+    for (let i = 1; i <= totalPaginas; i++) {
+      if (i === 1 || i === totalPaginas || Math.abs(i - pagina) <= 2) {
+        pages.push(i);
+      } else if (pages[pages.length - 1] !== '...') {
+        pages.push('...');
+      }
+    }
+
+    return (
+      <div className="paginador">
+        <button
+          className="paginador-item material-icons"
+          disabled={pagina === 1}
+          onClick={() => setPagina(p => p - 1)}
+        >
+          chevron_left
+        </button>
+
+        {pages.map((item, idx) => 
+          item === '...' ? (
+            <span key={`ellipsis-${idx}`} className="paginador-item">...</span>
+          ) : (
+            <button
+              key={item}
+              className={pagina === item ? "paginador-item-activo" : "paginador-item"}
+              onClick={() => setPagina(item)}
+            >
+              {item}
+            </button>
+          )
+        )}
+
+        <button
+          className="paginador-item material-icons"
+          disabled={pagina === totalPaginas}
+          onClick={() => setPagina(p => p + 1)}
+        >
+          chevron_right
+        </button>
+      </div>
+    );
+  };
+
   return (
     <>
       <div className="search-container">
@@ -205,47 +253,7 @@ export default function Cards({
         )}
       </div>
 
-      {totalPaginas > 1 && (
-        <div className="paginador">
-          <button
-            className="paginador-item material-icons"
-            disabled={pagina === 1}
-            onClick={() => setPagina(p => p - 1)}
-          >
-            chevron_left
-          </button>
-
-          {Array.from({ length: totalPaginas }, (_, i) => i + 1)
-            .filter(p => p === 1 || p === totalPaginas || Math.abs(p - pagina) <= 2)
-            .reduce((acc, p, idx, arr) => {
-              if (idx > 0 && p - arr[idx - 1] > 1) acc.push('...');
-              acc.push(p);
-              return acc;
-            }, [])
-            .map((item, idx) => 
-              item === '...' ? (
-                <span key={`ellipsis-${idx}`} className="paginador-item">...</span>
-              ) : (
-                <button
-                  key={item}
-                  className={pagina === item ? "paginador-item-activo" : "paginador-item"}
-                  onClick={() => setPagina(item)}
-                >
-                  {item}
-                </button>
-              )
-            )
-          }
-
-          <button
-            className="paginador-item material-icons"
-            disabled={pagina === totalPaginas}
-            onClick={() => setPagina(p => p + 1)}
-          >
-            chevron_right
-          </button>
-        </div>
-      )}
+      {renderPagination()}
     </>
   );
 }

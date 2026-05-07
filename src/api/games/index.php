@@ -5,6 +5,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 $id = $_GET['id'] ?? null;
 $action = $_GET['action'] ?? null;
 $id_plataforma = $_GET['plataforma_id'] ?? null;
+$favorito = $_GET['favorito'] ?? null;
 
 switch ($method) {
     case 'GET':
@@ -15,7 +16,7 @@ switch ($method) {
         } elseif ($action === 'all-plataforma') {
             getGamesByPlatform($id_plataforma);
         } else {
-            listGames();
+            listGames($favorito);
         }
         break;
     case 'POST':
@@ -49,10 +50,11 @@ function getGame($id) {
         juegos.desarrollador,
         juegos.genero,
         juegos.publicador,
-        juegos.lanzamiento, 
+        juegos.lanzamiento,
         juegos.plataforma_id,
         juegos.comentario,
         juegos.puntuacion,
+        juegos.favorito,
         plataformas.nombre as plataforma,
         juegos.id as id_juego, 
         juegos.id_imagen as id_imagen_games,
@@ -83,6 +85,7 @@ function getLastGames() {
         juegos.lanzamiento,
         juegos.estado,
         juegos.region,
+        juegos.favorito,
         plataformas.nombre AS plataforma,
         (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1) AS portada
         FROM juegos, plataformas
@@ -92,10 +95,10 @@ function getLastGames() {
     jsonResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
-function getGamesByPlatform($id_plataforma) {
+function getGamesByPlatform($platformId) {
     global $pdo;
     
-    $params = ['id_plataforma' => $id_plataforma];
+    $params = ['id_plataforma' => $platformId];
     extract(getPaginationParams());
     
     $countSql = "SELECT COUNT(*) as total FROM juegos, plataformas 
@@ -111,6 +114,7 @@ function getGamesByPlatform($id_plataforma) {
                         juegos.lanzamiento, 
                         juegos.estado, 
                         juegos.region,
+                        juegos.favorito,
                         plataformas.nombre AS plataforma, 
                         (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1) AS archivo 
                 FROM juegos, plataformas 
@@ -123,25 +127,33 @@ function getGamesByPlatform($id_plataforma) {
     jsonResponse(getPaginatedResponse($pdo, $countSql, $dataSql, $params, $search, $limit, $offset));
 }
 
-function listGames() {
+function listGames($favorito = null) {
     global $pdo;
     
     extract(getPaginationParams());
     
+    $favoritoFilter = "";
+    if ($favorito == '1') {
+        $favoritoFilter = " AND juegos.favorito = 1";
+    }
+    
     $countSql = "SELECT COUNT(*) as total FROM juegos, plataformas 
                  WHERE juegos.plataforma_id = plataformas.id" . 
-                 ($search ? " AND juegos.titulo LIKE :search" : "");
+                 ($search ? " AND juegos.titulo LIKE :search" : "") . 
+                 $favoritoFilter;
     
     $dataSql = "SELECT juegos.id, 
                         juegos.titulo, 
                         juegos.id_imagen, 
                         juegos.valor, 
                         juegos.region,
+                        juegos.favorito,
                         (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1) AS portada, 
                         plataformas.nombre as plataforma 
                 FROM juegos, plataformas 
                 WHERE juegos.plataforma_id = plataformas.id" . 
-                ($search ? " AND juegos.titulo LIKE :search" : "") . " 
+                ($search ? " AND juegos.titulo LIKE :search" : "") . 
+                $favoritoFilter . " 
                 ORDER BY juegos.created_at DESC 
                 LIMIT :limit OFFSET :offset";
     
@@ -155,8 +167,8 @@ function createGame() {
     $id_imagen = generateIdImagen();
     
     $stmt = $pdo->prepare("INSERT INTO juegos 
-        (titulo, plataforma_id, id_imagen, region, formato, estado, valor, fecha_compra, notas, cartucho, manual, caja, lanzamiento, desarrollador, genero, publicador, comentario, puntuacion) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        (titulo, plataforma_id, id_imagen, region, formato, estado, valor, fecha_compra, notas, cartucho, manual, caja, lanzamiento, desarrollador, genero, publicador, comentario, puntuacion, favorito) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     
     $stmt->execute([
         $data['titulo'] ?? null,
@@ -176,7 +188,8 @@ function createGame() {
         $data['genero'] ?? null,
         $data['publicador'] ?? null,
         $data['comentario'] ?? null,
-        $data['puntuacion'] ?? null
+        $data['puntuacion'] ?? null,
+        $data['favorito'] ?? 0
     ]);
     
     jsonResponse(["message" => "Juego creado", "id" => $id_imagen], 201);
@@ -188,26 +201,66 @@ function updateGame($id) {
     requireId($id, 'ID de juego requerido');
     $data = getJsonInput();
     
+    // Obtener datos actuales
+    $stmt = $pdo->prepare("SELECT * FROM juegos WHERE id = ?");
+    $stmt->execute([$id]);
+    $juego = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$juego) {
+        jsonResponse(['error' => 'Juego no encontrado'], 404);
+    }
+    
+    // Mezclar datos
+    $titulo = $data['titulo'] ?? $juego['titulo'];
+    $plataforma_id = $data['plataforma_id'] ?? $juego['plataforma_id'];
+    if ($plataforma_id === '') $plataforma_id = null;
+    
+    $region = $data['region'] ?? $juego['region'];
+    $formato = $data['formato'] ?? $juego['formato'];
+    $estado = $data['estado'] ?? $juego['estado'];
+    $valor = $data['valor'] ?? $juego['valor'];
+    if ($valor === '') $valor = null;
+    
+    $cartucho = $data['cartucho'] ?? $juego['cartucho'];
+    $manual = $data['manual'] ?? $juego['manual'];
+    $caja = $data['caja'] ?? $juego['caja'];
+    $lanzamiento = $data['lanzamiento'] ?? $juego['lanzamiento'];
+    if ($lanzamiento === '') $lanzamiento = null;
+    
+    $desarrollador = $data['desarrollador'] ?? $juego['desarrollador'];
+    $genero = $data['genero'] ?? $juego['genero'];
+    $publicador = $data['publicador'] ?? $juego['publicador'];
+    $comentario = $data['comentario'] ?? $juego['comentario'];
+    $puntuacion = $data['puntuacion'] ?? $juego['puntuacion'];
+    if ($puntuacion === '') $puntuacion = null;
+    
+    if (isset($data['favorito'])) {
+        $favorito = filter_var($data['favorito'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+    } else {
+        $favorito = (int)$juego['favorito'];
+    }
+    
     $stmt = $pdo->prepare("UPDATE juegos SET 
-        titulo = ?, plataforma_id = ?, region = ?, formato = ?, estado = ?, valor = ?, cartucho = ?, manual = ?, caja = ?, lanzamiento = ?, desarrollador = ?, genero = ?, publicador = ?, comentario = ?, puntuacion = ? 
+        titulo = ?, plataforma_id = ?, region = ?, formato = ?, estado = ?, valor = ?, cartucho = ?, manual = ?, caja = ?, lanzamiento = ?, desarrollador = ?, genero = ?, publicador = ?, comentario = ?, puntuacion = ?, favorito = ? 
         WHERE id = ?");
     
     $stmt->execute([
-        $data['titulo'] ?? null,
-        $data['plataforma_id'] ?? null,
-        $data['region'] ?? null,
-        $data['formato'] ?? null,
-        $data['estado'] ?? null,
-        $data['valor'] ?? null,
-        $data['cartucho'] ?? null,
-        $data['manual'] ?? null,
-        $data['caja'] ?? null,
-        $data['lanzamiento'] ?? null,
-        $data['desarrollador'] ?? null,
-        $data['genero'] ?? null,
-        $data['publicador'] ?? null,
-        $data['comentario'] ?? null,
-        $data['puntuacion'] ?? null,
+        $titulo,
+        $plataforma_id,
+        $region,
+        $formato,
+        $estado,
+        $valor,
+        $cartucho,
+        $manual,
+        $caja,
+        $lanzamiento,
+        $desarrollador,
+        $genero,
+        $publicador,
+        $comentario,
+        $puntuacion,
+        $favorito,
         $id
     ]);
     
