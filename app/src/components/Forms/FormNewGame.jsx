@@ -181,12 +181,9 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
         juegoId = juegoEditar ? juegoEditar.id_imagen_games : data.id;
         
         
-        if (portada) {
+        if (portada && portada instanceof File) {
 
-
-
-
-          // Luego enviar las imágenes si hay
+            // Luego enviar las imágenes si hay
             const fd = new FormData();
             fd.append("imagenes[]", portada);
 
@@ -202,7 +199,7 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
         }
 
 
-        if (contraportada) {
+        if (contraportada && contraportada instanceof File) {
 
           // Luego enviar las imágenes si hay
             const fd = new FormData();
@@ -223,18 +220,21 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
 
 
         
-         if (galeria) {
+         if (galeria && galeria.length > 0) {
 
           // Luego enviar las imágenes si hay
             const fd = new FormData();
 
 
             for (let img of galeria) {
-                fd.append("imagenes[]", img);
+                if (img instanceof File) {
+                    fd.append("imagenes[]", img);
+                }
             }
 
-            fd.append("juego_id", juegoId);
-            fd.append("tipo", '4');
+            if (fd.has("imagenes[]")) {
+                fd.append("juego_id", juegoId);
+                fd.append("tipo", '4');
 
                 const imgRes = await fetch(`${API_URL}/imagenes/`, {
                     method: "POST",
@@ -242,11 +242,12 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
                 });
 
                 if (!imgRes.ok) throw new Error("Error al subir imágenes");
+            }
         }
 
 
 
-        if (poster) {
+        if (poster && poster instanceof File) {
 
             const fd = new FormData();
             fd.append("imagenes[]", poster);
@@ -261,7 +262,7 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
                 if (!imgRes.ok) throw new Error("Error al subir imágenes");
         }
 
-        if (logo) {
+        if (logo && logo instanceof File) {
 
             const fd = new FormData();
             fd.append("imagenes[]", logo);

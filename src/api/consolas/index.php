@@ -98,7 +98,7 @@ function listConsolas() {
                         consolas.manuales,
                         consolas.carton,
                         consolas.valor,
-                        (SELECT archivo FROM imagenes WHERE juego_id = consolas.id_imagen ORDER BY created_at DESC LIMIT 1) AS archivo,
+                        (SELECT archivo FROM imagenes WHERE juego_id = consolas.id_imagen and tipo = 0 ORDER BY created_at DESC LIMIT 1) AS portada,
                         plataformas.nombre AS plataforma
                 FROM consolas, plataformas 
                 WHERE consolas.plataforma_id = plataformas.id" . 

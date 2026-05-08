@@ -92,7 +92,8 @@ export default function Cards({
       'juego': `/detalle-juego/${item.id}/${item.id_imagen}`,
       'consola': `/consolas/detalle/${item.id}/${item.id_imagen}`,
       'libro': `/libros/detalle/${item.id}/${item.id_imagen}`,
-      'amiibo': `/amiibos/detalle/${item.id}/${item.id_imagen}`
+      'amiibo': `/amiibos/detalle/${item.id}/${item.id_imagen}`,
+      'accesorio': `/accesorios/detalle/${item.id}/${item.id_imagen}`
     };
     return baseUrls[type] || baseUrls['juego'];
   };

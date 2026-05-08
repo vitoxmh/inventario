@@ -13,6 +13,7 @@ export default function Detalle() {
     const { id, id_imagen } = useParams();
     const [galeria, setGaleria] = useState([]);
     const [consola, setConsola] = useState(null);
+    const dialogRef = useRef(null);
 
 
     useEffect(() => {
@@ -120,9 +121,23 @@ export default function Detalle() {
             </main>
         </div>
 
-  
+   
+        <dialog ref={dialogRef} className="modal">
+            <button onClick={() => dialogRef.current.close()} className="modal-cerrar">x</button>
+            <div className="modal-content"></div>
+        </dialog>
         </>
     );
 
+    async function deleteImage(id) {
+        if (!confirm("¿Eliminar imagen?")) return;
+        try {
+            const res = await fetch(`${API_URL}/imagenes/?id=${id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Error al eliminar");
+            setGaleria(galeria.filter(img => img.id !== id));
+        } catch (err) {
+            alert(err.message);
+        }
+    }
 
 }
