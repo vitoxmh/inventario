@@ -9,6 +9,7 @@ export default function DetalleAccesorio() {
     const navigate = useNavigate();
     const [accesorio, setAccesorio] = useState(null);
     const [imagenes, setImagenes] = useState([]);
+    const [plataformas, setPlataformas] = useState([]);
     const dialogRef = useRef(null);
 
     useEffect(() => {
@@ -22,11 +23,16 @@ export default function DetalleAccesorio() {
         fetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
             .then(r => r.json())
             .then(setImagenes);
+
+        fetch(`${API_URL}/games/plataformas.php`)
+            .then(r => r.json())
+            .then(setPlataformas);
     }, [id, id_imagen]);
 
     if (!accesorio) return <p>Cargando...</p>;
 
     const portada = imagenes.find(img => img.tipo === "0");
+    const plataformaNombre = plataformas.find(p => p.id == accesorio.plataforma)?.nombre || accesorio.plataforma || '-';
 
     const deleteImage = (imgId) => {
         fetch(`${API_URL}/imagenes/${imgId}/`, {
@@ -115,7 +121,7 @@ export default function DetalleAccesorio() {
                             </div>
                             <div className='detalle-juego-card'>
                                 <p className='detalle-juego-card-text'>Plataforma</p>
-                                <h4 className='detalle-juego-card-title'>{accesorio.plataforma || '-'}</h4>
+                                <h4 className='detalle-juego-card-title'>{accesorio.nombrePlataforma}</h4>
                             </div>
                             <div className='detalle-juego-card'>
                                 <p className='detalle-juego-card-text'>Año</p>

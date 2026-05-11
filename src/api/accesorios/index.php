@@ -32,7 +32,7 @@ function getAccesorio($id) {
     global $pdo;
     requireId($id, 'ID de accesorio requerido');
     
-    $stmt = $pdo->prepare("SELECT * FROM accesorios WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT *,(SELECT nombre FROM plataformas WHERE id = accesorios.plataforma) as nombrePlataforma  FROM accesorios WHERE id = ?");
     $stmt->execute([$id]);
     $accesorio = $stmt->fetch(PDO::FETCH_ASSOC);
     

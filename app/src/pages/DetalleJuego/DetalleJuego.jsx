@@ -115,7 +115,7 @@ export default function DetalleJuego() {
                     <div className="detalle-juego-overlay">
                     <Breadcrumb items={[    
                                             { label: "Games", to: "/games" },
-                                            { label: juego.plataforma, to: "/plataformas" },
+                                            { label: juego.plataforma, to: "/detalle-plataforma/"+juego.plataforma_id+"/" },
                                             { label: juego.titulo, active: true }
                                         ]}/>
                     <div className="detalle-juego">

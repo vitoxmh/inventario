@@ -24,7 +24,16 @@ export default function NewAccesorio() {
 
     const estadoOptions = ["Nuevo", "Usado - Excelente", "Usado - Bueno", "Usado - Aceptable"];
     const tipoOptions = ["Control", "Cargador", "Memoria", "Auriculares", "Estuche", "Otro"];
-    const plataformaOptions = ["Nintendo Switch", "PlayStation", "Xbox", "Sega", "Nintendo 3DS", "Nintendo DS", "Game Boy", "Otro"];
+    const [plataformaOptions, setPlataformaOptions] = useState([]);
+
+    useEffect(() => {
+        fetch(`${API_URL}/games/plataformas.php`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+        })
+        .then(r => r.json())
+        .then(setPlataformaOptions);
+    }, []);
 
     const handleDrop = (e, setImagen) => {
         e.preventDefault();
@@ -174,7 +183,7 @@ export default function NewAccesorio() {
                                 >
                                     <option value="">Seleccionar Plataforma</option>
                                     {plataformaOptions.map((plat) => (
-                                        <option key={plat} value={plat}>{plat}</option>
+                                        <option key={plat.id} value={plat.id}>{plat.nombre}</option>
                                     ))}
                                 </select>
                             </div>
