@@ -116,7 +116,7 @@ function getGamesByPlatform($platformId) {
                         juegos.region,
                         juegos.favorito,
                         plataformas.nombre AS plataforma, 
-                        (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1) AS portada 
+                        (SELECT archivo FROM imagenes WHERE tipo = '0' AND imagenes.juego_id = juegos.id_imagen ORDER BY imagenes.id DESC LIMIT 1) AS archivo 
                 FROM juegos, plataformas 
                 WHERE juegos.plataforma_id = plataformas.id 
                 AND juegos.plataforma_id = :id_plataforma" . 

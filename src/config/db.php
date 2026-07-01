@@ -1,9 +1,9 @@
 <?php
-$host = 'mysql';
+$host = 'localhost';
 $db   = 'videojuegos';
 $user = 'app';
 $pass = 'app';
-
+ 
 try {
     $pdo = new PDO(
         "mysql:host=$host;dbname=$db;charset=utf8mb4",
