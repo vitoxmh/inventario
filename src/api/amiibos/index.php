@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../helpers.php';
+require_once __DIR__ . '/../middleware/auth.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $id = $_GET['id'] ?? null;
@@ -16,12 +17,15 @@ switch ($method) {
         }
         break;
     case 'POST':
+        requireAdmin();
         createAmiibo();
         break;
     case 'PUT':
+        requireAdmin();
         updateAmiibo($id);
         break;
     case 'DELETE':
+        requireAdmin();
         deleteAmiibo($id);
         break;
     default:

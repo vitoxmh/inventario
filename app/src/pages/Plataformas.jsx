@@ -3,14 +3,14 @@ import Header from '../components/Header/Header'
 import Breadcrumb from '../components/Breadcrumb/Breadcrumb';
 import Aside from '../components/Aside/Aside'
 import { Link } from "react-router-dom";
-import { API_URL } from '../config/api'; 
+import { API_URL, apiFetch } from '../config/api'; 
  
 export default function Plataformas() {
 
     const [plataformas, setPlataformas] = useState([]);
 
     const cargarPlataformas = () => {
-        fetch(`${API_URL}/plataformas/`)
+        apiFetch('/plataformas/')
         .then(r => r.json())
         .then(setPlataformas);
     };
@@ -24,7 +24,7 @@ export default function Plataformas() {
         e.preventDefault();
         if (!window.confirm(`¿Eliminar la plataforma "${plataforma.nombre}"? Esto eliminará todos los juegos asociados.`)) return;
         
-        fetch(`${API_URL}/plataformas/${plataforma.id}/`, { method: 'DELETE' })
+        apiFetch(`/plataformas/${plataforma.id}/`, { method: 'DELETE' })
             .then(r => {
                 if (r.ok) {
                     cargarPlataformas();

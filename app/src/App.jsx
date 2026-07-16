@@ -1,6 +1,9 @@
 import './App.scss'
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Login from "./pages/Login";
 import Home from "./pages/Home/Home";
 import Plataformas from "./pages/Plataformas";
 import JuegoDetalle from "./pages/JuegoDetalle";
@@ -31,35 +34,38 @@ function App() {
 
   return (
     <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/plataformas" element={<Plataformas />} />
-          <Route path="/game/:id/:id_imagen" element={<JuegoDetalle />} />
-          <Route path="/games/" element={<Games />} />
-          <Route path="/consolas/" element={<Consolas />} />
-          <Route path="/new-game/" element={<NewGame />} />
-          <Route path="/detalle-juego/:id/:id_imagen" element={<DetalleJuego />} />
-          <Route path="/editar-juego/:id/:id_imagen" element={<EditarGame />} />
-          <Route path="/detalle-plataforma/:id/" element={<DetallePlataforma />} />
-          <Route path="/consolas/add/" element={<NewConsola />} />
-          <Route path="/consolas/detalle/:id/:id_imagen/" element={<DetalleConsola />} />
-          <Route path="/consolas/edit/:id/:id_imagen/" element={<EditConsola />} />
-          <Route path="/amiibos/" element={<AmiibosYFiguras />} />
-          <Route path="/amiibos/nuevo/" element={<NewAmiiboYFigura />} />
-          <Route path="/amiibos/detalle/:id/:id_imagen/" element={<DetalleAmiiboYFigura />} />
-          <Route path="/amiibos/editar/:id/:id_imagen/" element={<EditAmiiboYFigura />} />
-          <Route path="/libros/" element={<Libros />} />
-          <Route path="/libros/nuevo/" element={<NewLibro />} />
-          <Route path="/libros/detalle/:id/:id_imagen/" element={<DetalleLibro />} />
-          <Route path="/libros/editar/:id/:id_imagen/" element={<EditLibro />} />
-          <Route path="/accesorios/" element={<Accesorios />} />
-          <Route path="/accesorios/nuevo/" element={<NewAccesorio />} />
-          <Route path="/accesorios/detalle/:id/:id_imagen/" element={<DetalleAccesorio />} />
-          <Route path="/accesorios/editar/:id/:id_imagen/" element={<EditAccesorio />} />
-          <Route path="/favoritos/" element={<Favoritos />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/plataformas" element={<ProtectedRoute><Plataformas /></ProtectedRoute>} />
+            <Route path="/game/:id/:id_imagen" element={<ProtectedRoute><JuegoDetalle /></ProtectedRoute>} />
+            <Route path="/games/" element={<ProtectedRoute><Games /></ProtectedRoute>} />
+            <Route path="/consolas/" element={<ProtectedRoute><Consolas /></ProtectedRoute>} />
+            <Route path="/new-game/" element={<ProtectedRoute adminOnly><NewGame /></ProtectedRoute>} />
+            <Route path="/detalle-juego/:id/:id_imagen" element={<ProtectedRoute><DetalleJuego /></ProtectedRoute>} />
+            <Route path="/editar-juego/:id/:id_imagen" element={<ProtectedRoute adminOnly><EditarGame /></ProtectedRoute>} />
+            <Route path="/detalle-plataforma/:id/" element={<ProtectedRoute><DetallePlataforma /></ProtectedRoute>} />
+            <Route path="/consolas/add/" element={<ProtectedRoute adminOnly><NewConsola /></ProtectedRoute>} />
+            <Route path="/consolas/detalle/:id/:id_imagen/" element={<ProtectedRoute><DetalleConsola /></ProtectedRoute>} />
+            <Route path="/consolas/edit/:id/:id_imagen/" element={<ProtectedRoute adminOnly><EditConsola /></ProtectedRoute>} />
+            <Route path="/amiibos/" element={<ProtectedRoute><AmiibosYFiguras /></ProtectedRoute>} />
+            <Route path="/amiibos/nuevo/" element={<ProtectedRoute adminOnly><NewAmiiboYFigura /></ProtectedRoute>} />
+            <Route path="/amiibos/detalle/:id/:id_imagen/" element={<ProtectedRoute><DetalleAmiiboYFigura /></ProtectedRoute>} />
+            <Route path="/amiibos/editar/:id/:id_imagen/" element={<ProtectedRoute adminOnly><EditAmiiboYFigura /></ProtectedRoute>} />
+            <Route path="/libros/" element={<ProtectedRoute><Libros /></ProtectedRoute>} />
+            <Route path="/libros/nuevo/" element={<ProtectedRoute adminOnly><NewLibro /></ProtectedRoute>} />
+            <Route path="/libros/detalle/:id/:id_imagen/" element={<ProtectedRoute><DetalleLibro /></ProtectedRoute>} />
+            <Route path="/libros/editar/:id/:id_imagen/" element={<ProtectedRoute adminOnly><EditLibro /></ProtectedRoute>} />
+            <Route path="/accesorios/" element={<ProtectedRoute><Accesorios /></ProtectedRoute>} />
+            <Route path="/accesorios/nuevo/" element={<ProtectedRoute adminOnly><NewAccesorio /></ProtectedRoute>} />
+            <Route path="/accesorios/detalle/:id/:id_imagen/" element={<ProtectedRoute><DetalleAccesorio /></ProtectedRoute>} />
+            <Route path="/accesorios/editar/:id/:id_imagen/" element={<ProtectedRoute adminOnly><EditAccesorio /></ProtectedRoute>} />
+            <Route path="/favoritos/" element={<ProtectedRoute><Favoritos /></ProtectedRoute>} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </>
   )
 }

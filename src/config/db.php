@@ -1,5 +1,5 @@
 <?php
-$host = 'localhost';
+$host = 'mysql';
 $db   = 'videojuegos';
 $user = 'app';
 $pass = 'app';

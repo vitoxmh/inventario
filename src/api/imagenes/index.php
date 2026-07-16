@@ -4,15 +4,58 @@ ini_set('upload_max_filesize', '128M');
 ini_set('memory_limit', '128M');
 
 require_once __DIR__ . '/../helpers.php';
+require_once __DIR__ . '/../middleware/auth.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+$method = $_SERVER['REQUEST_METHOD'];
+
+if ($method === 'GET') {
     getImagenes();
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+} elseif ($method === 'POST') {
+    requireAdmin();
     uploadImagenes();
-} elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+} elseif ($method === 'DELETE') {
+    requireAdmin();
     deleteImagen();
 } else {
     jsonResponse(['error' => 'Método no permitido'], 405);
+}
+
+define('MAX_FILE_SIZE', 5 * 1024 * 1024);
+define('ALLOWED_MIME_TYPES', [
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+    'image/gif'
+]);
+define('ALLOWED_EXTENSIONS', ['jpg', 'jpeg', 'png', 'webp', 'gif']);
+
+function validateUploadedFile($file) {
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        jsonResponse(['error' => 'Error en la subida del archivo: ' . $file['error']], 400);
+    }
+    
+    if ($file['size'] > MAX_FILE_SIZE) {
+        jsonResponse(['error' => 'El archivo excede el tamaño máximo de 5MB'], 400);
+    }
+    
+    $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if (!in_array($extension, ALLOWED_EXTENSIONS)) {
+        jsonResponse(['error' => 'Extensión no permitida: ' . $extension . '. Permitidas: ' . implode(', ', ALLOWED_EXTENSIONS)], 400);
+    }
+    
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mimeType = $finfo->file($file['tmp_name']);
+    
+    if (!in_array($mimeType, ALLOWED_MIME_TYPES)) {
+        jsonResponse(['error' => 'Tipo de archivo no permitido: ' . $mimeType], 400);
+    }
+    
+    $imageInfo = @getimagesize($file['tmp_name']);
+    if ($imageInfo === false) {
+        jsonResponse(['error' => 'El archivo no es una imagen válida'], 400);
+    }
+    
+    return true;
 }
 
 function getImagenes() {
@@ -46,7 +89,7 @@ function getImagenes() {
         }
         jsonResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
     } catch (PDOException $e) {
-        jsonResponse(['error' => $e->getMessage()], 500);
+        jsonResponse(['error' => 'Error interno del servidor'], 500);
     }
 }
 
@@ -65,10 +108,17 @@ function uploadImagenes() {
     }
     
     $type = $_POST['tipo'] ?? 'imagen';
+    $type = sanitizeString($type);
+    
+    $allowedTypes = ['imagen', 'portada', 'contraportada', 'poster', 'logo', '0', '1', '2', '3'];
+    if (!in_array($type, $allowedTypes)) {
+        jsonResponse(["error" => "Tipo de imagen inválido"], 400);
+    }
+    
     $dir = __DIR__ . "/uploads";
     
     if (!is_dir($dir)) {
-        mkdir($dir, 0777, true);
+        mkdir($dir, 0755, true);
     }
     
     $imagenes = [];
@@ -78,7 +128,18 @@ function uploadImagenes() {
             continue;
         }
         
-        $nombre = uniqid() . "_" . basename($_FILES['imagenes']['name'][$i]);
+        $file = [
+            'name'     => $_FILES['imagenes']['name'][$i],
+            'type'     => $_FILES['imagenes']['type'][$i],
+            'tmp_name' => $_FILES['imagenes']['tmp_name'][$i],
+            'error'    => $_FILES['imagenes']['error'][$i],
+            'size'     => $_FILES['imagenes']['size'][$i]
+        ];
+        
+        validateUploadedFile($file);
+        
+        $extension = strtolower(pathinfo($_FILES['imagenes']['name'][$i], PATHINFO_EXTENSION));
+        $nombre = bin2hex(random_bytes(16)) . '.' . $extension;
         
         if (move_uploaded_file($tmp, "$dir/$nombre")) {
             try {
@@ -91,7 +152,7 @@ function uploadImagenes() {
                 }
                 $imagenes[] = $nombre;
             } catch (PDOException $e) {
-                jsonResponse(['error' => 'Error DB: ' . $e->getMessage()], 500);
+                jsonResponse(['error' => 'Error al guardar en la base de datos'], 500);
             }
         }
     }
@@ -110,6 +171,6 @@ function deleteImagen() {
         $stmt->execute([$id]);
         jsonResponse(["ok" => true]);
     } catch (PDOException $e) {
-        jsonResponse(['error' => $e->getMessage()], 500);
+        jsonResponse(['error' => 'Error al eliminar la imagen'], 500);
     }
 }

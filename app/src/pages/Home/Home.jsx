@@ -1,5 +1,5 @@
 import Aside from '../../components/Aside/Aside'
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
 import Header from '../../components/Header/Header';
 import CardGames from '../../components/Cards/CardGame';
 import { Link } from "react-router-dom";
@@ -17,7 +17,7 @@ export default function Home() {
     const [lastAmiibos, setLastAmiibos] = useState([]);
 
     useEffect(() => {
-        fetch(`${API_URL}/plataformas/?action=countPlataformas`)
+        apiFetch('/plataformas/?action=countPlataformas')
         .then(r => r.json())
         .then(setPlataformas);
     }, []);
@@ -25,19 +25,19 @@ export default function Home() {
 
 
      useEffect(() => {
-        fetch(`${API_URL}/games/?action=last`)
+        apiFetch('/games/?action=last')
         .then(r => r.json())
         .then(setLastGame);
     }, []);
 
     useEffect(() => {
-        fetch(`${API_URL}/consolas/?action=last`)
+        apiFetch('/consolas/?action=last')
         .then(r => r.json())
         .then(setLastConsolas);
     }, []);
 
     useEffect(() => {
-        fetch(`${API_URL}/amiibos/?action=last`)
+        apiFetch('/amiibos/?action=last')
         .then(r => r.json())
         .then(setLastAmiibos);
     }, []);

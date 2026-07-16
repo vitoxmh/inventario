@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import "./CardPaginator.scss";
-import { API_URL } from '../../config/api'; 
+import { API_URL, apiFetch } from '../../config/api'; 
 
 export default function Cards({
   apiEndpoint = `${API_URL}/games/`,
@@ -22,9 +22,8 @@ export default function Cards({
     
     try {
       const nuevoEstado = !item.favorito;
-      const res = await fetch(`${API_URL}/games/${item.id}/`, {
+      const res = await apiFetch(`/games/${item.id}/`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...item, favorito: nuevoEstado })
       });
       if (res.ok) {
@@ -50,7 +49,7 @@ export default function Cards({
     const url = `${apiEndpoint}${separator}${params.toString()}`;
 
     try {
-      const resp = await fetch(url);
+      const resp = await apiFetch(url.replace(API_URL, ''));
       const data = await resp.json();
       setItems(data.data || []);
       setTotalPaginas(data.pagination?.totalPages || 0);
@@ -74,8 +73,9 @@ export default function Cards({
     if (!window.confirm(`¿Eliminar "${item.titulo || item.nombre}"?`)) return;
     
     try {
-      const endpoint = deleteEndpoint ? `${deleteEndpoint}${item.id}/` : `${apiEndpoint}${item.id}/`;
-      const resp = await fetch(endpoint, { method: 'DELETE' });
+      const fullEndpoint = deleteEndpoint ? `${deleteEndpoint}${item.id}/` : `${apiEndpoint}${item.id}/`;
+      const endpoint = fullEndpoint.replace(API_URL, '');
+      const resp = await apiFetch(endpoint, { method: 'DELETE' });
       if (resp.ok) {
         cargarItems();
       } else {

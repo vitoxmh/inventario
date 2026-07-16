@@ -2,8 +2,12 @@
 
 require_once __DIR__ . '/headers.php';
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/middleware/sanitize.php';
+require_once __DIR__ . '/middleware/rate_limit.php';
 
 header('Content-Type: application/json');
+
+checkRateLimit();
 
 function getPaginationParams() {
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -75,7 +79,7 @@ function requireId($id, $errorMsg = 'ID requerido') {
 }
 
 function getJsonInput() {
-    return json_decode(file_get_contents('php://input'), true);
+    return sanitizeJsonInput();
 }
 
 function validateRequired($data, $field, $errorMsg = null) {

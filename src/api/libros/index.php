@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../helpers.php';
+require_once __DIR__ . '/../middleware/auth.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $id = $_GET['id'] ?? null;
@@ -16,12 +17,15 @@ switch ($method) {
         }
         break;
     case 'POST':
+        requireAdmin();
         createLibro();
         break;
     case 'PUT':
+        requireAdmin();
         updateLibro($id);
         break;
     case 'DELETE':
+        requireAdmin();
         deleteLibro($id);
         break;
     default:

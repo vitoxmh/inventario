@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { API_URL } from '../../config/api';
+import { apiFetch } from '../../config/api';
 
-// SRP: Este hook solo maneja la lógica de datos de juegos
 export function useGames() {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -17,7 +16,7 @@ export function useGames() {
     });
 
     try {
-      const resp = await fetch(`${endpoint}?${params}`);
+      const resp = await apiFetch(`${endpoint}?${params}`);
       const data = await resp.json();
       setGames(data.data || []);
       setPagination(data.pagination || { totalPages: 0 });
@@ -30,9 +29,8 @@ export function useGames() {
 
   const toggleFavorito = async (id, currentState) => {
     try {
-      const res = await fetch(`${API_URL}/games/${id}/`, {
+      const res = await apiFetch(`/games/${id}/`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ favorito: !currentState })
       });
       if (res.ok) {
