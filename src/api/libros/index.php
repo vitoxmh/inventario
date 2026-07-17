@@ -29,7 +29,7 @@ switch ($method) {
         deleteLibro($id);
         break;
     default:
-        jsonResponse(['error' => 'Method not allowed'], 405);
+        errorResponse('Method not allowed', 405);
 }
 
 function getLibro($id) {
@@ -41,9 +41,9 @@ function getLibro($id) {
     $libro = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$libro) {
-        jsonResponse(['error' => 'Libro no encontrado'], 404);
+        errorResponse('Libro no encontrado', 404);
     }
-    jsonResponse($libro);
+    successResponse($libro);
 }
 
 function getLastLibros() {
@@ -61,7 +61,7 @@ function getLastLibros() {
         FROM libros
         ORDER BY libros.created_at DESC
         LIMIT 10");
-    jsonResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
+    successResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
 function listLibros() {
@@ -86,7 +86,8 @@ function listLibros() {
                 ORDER BY libros.created_at DESC 
                 LIMIT :limit OFFSET :offset";
     
-    jsonResponse(getPaginatedResponse($pdo, $countSql, $dataSql, [], $search, $limit, $offset));
+    $result = getPaginatedResponse($pdo, $countSql, $dataSql, [], $search, $limit, $offset);
+    paginatedResponse($result['data'], $result['pagination']);
 }
 
 function createLibro() {
@@ -112,7 +113,7 @@ function createLibro() {
     ]);
     
     $id = $pdo->lastInsertId();
-    jsonResponse(['id' => $id, 'id_imagen' => $id_imagen, 'message' => 'Libro creado correctamente'], 201);
+    successResponse(['id' => $id, 'id_imagen' => $id_imagen], 'Libro creado correctamente', 201);
 }
 
 function updateLibro($id) {
@@ -136,7 +137,7 @@ function updateLibro($id) {
         $id
     ]);
     
-    jsonResponse(['message' => 'Libro actualizado correctamente']);
+    successResponse(null, 'Libro actualizado correctamente');
 }
 
 function deleteLibro($id) {
@@ -146,5 +147,5 @@ function deleteLibro($id) {
     
     $stmt = $pdo->prepare("DELETE FROM libros WHERE id = ?");
     $stmt->execute([$id]);
-    jsonResponse(['message' => 'Libro eliminado correctamente']);
+    successResponse(null, 'Libro eliminado correctamente');
 }

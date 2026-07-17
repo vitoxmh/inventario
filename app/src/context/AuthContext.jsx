@@ -28,19 +28,20 @@ export function AuthProvider({ children }) {
 
         const data = await response.json();
 
-        if (!response.ok) {
+        if (!response.ok || !data.success) {
             throw new Error(data.error || 'Error al iniciar sesión');
         }
 
-        localStorage.setItem('token', data.access_token);
-        localStorage.setItem('refreshToken', data.refresh_token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        const authData = data.data;
+        localStorage.setItem('token', authData.access_token);
+        localStorage.setItem('refreshToken', authData.refresh_token);
+        localStorage.setItem('user', JSON.stringify(authData.user));
 
-        setToken(data.access_token);
-        setRefreshToken(data.refresh_token);
-        setUser(data.user);
+        setToken(authData.access_token);
+        setRefreshToken(authData.refresh_token);
+        setUser(authData.user);
 
-        return data;
+        return authData;
     };
 
     const register = async (nombre, email, password) => {
@@ -52,19 +53,20 @@ export function AuthProvider({ children }) {
 
         const data = await response.json();
 
-        if (!response.ok) {
+        if (!response.ok || !data.success) {
             throw new Error(data.error || 'Error al registrar');
         }
 
-        localStorage.setItem('token', data.access_token);
-        localStorage.setItem('refreshToken', data.refresh_token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        const authData = data.data;
+        localStorage.setItem('token', authData.access_token);
+        localStorage.setItem('refreshToken', authData.refresh_token);
+        localStorage.setItem('user', JSON.stringify(authData.user));
 
-        setToken(data.access_token);
-        setRefreshToken(data.refresh_token);
-        setUser(data.user);
+        setToken(authData.access_token);
+        setRefreshToken(authData.refresh_token);
+        setUser(authData.user);
 
-        return data;
+        return authData;
     };
 
     const refreshAccessToken = async () => {
@@ -77,18 +79,19 @@ export function AuthProvider({ children }) {
 
             const data = await response.json();
 
-            if (!response.ok) {
+            if (!response.ok || !data.success) {
                 logout();
                 return null;
             }
 
-            localStorage.setItem('token', data.access_token);
-            localStorage.setItem('refreshToken', data.refresh_token);
+            const authData = data.data;
+            localStorage.setItem('token', authData.access_token);
+            localStorage.setItem('refreshToken', authData.refresh_token);
 
-            setToken(data.access_token);
-            setRefreshToken(data.refresh_token);
+            setToken(authData.access_token);
+            setRefreshToken(authData.refresh_token);
 
-            return data.access_token;
+            return authData.access_token;
         } catch {
             logout();
             return null;

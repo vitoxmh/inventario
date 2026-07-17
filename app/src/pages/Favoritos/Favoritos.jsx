@@ -3,16 +3,16 @@ import Header from '../../components/Header/Header'
 import Cards from '../../components/Cards/CardPaginator';
 import Aside from '../../components/Aside/Aside'
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
 
 export default function Favoritos() {  
   const [plataformas, setPlataformas] = useState([]);
 
   useEffect(() => {
     document.title = 'Juegos Favoritos';
-    fetch(`${API_URL}/plataformas/`)
+    apiFetch(`/plataformas/`)
       .then(r => r.json())
-      .then(setPlataformas);
+      .then(json => setPlataformas(Array.isArray(json.data) ? json.data : []));
   }, []);
 
   return (

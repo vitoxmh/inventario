@@ -7,8 +7,6 @@ require_once __DIR__ . '/middleware/rate_limit.php';
 
 header('Content-Type: application/json');
 
-checkRateLimit();
-
 function getPaginationParams() {
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
@@ -70,6 +68,27 @@ function jsonResponse($data, $statusCode = 200) {
     http_response_code($statusCode);
     echo json_encode($data);
     exit;
+}
+
+function successResponse($data = null, $message = null, $statusCode = 200) {
+    $response = ['success' => true];
+    if ($message) $response['message'] = $message;
+    if ($data !== null) $response['data'] = $data;
+    jsonResponse($response, $statusCode);
+}
+
+function errorResponse($message, $statusCode = 400, $details = null) {
+    $response = ['success' => false, 'error' => $message];
+    if ($details) $response['details'] = $details;
+    jsonResponse($response, $statusCode);
+}
+
+function paginatedResponse($data, $pagination, $statusCode = 200) {
+    jsonResponse([
+        'success' => true,
+        'data' => $data,
+        'pagination' => $pagination
+    ], $statusCode);
 }
 
 function requireId($id, $errorMsg = 'ID requerido') {

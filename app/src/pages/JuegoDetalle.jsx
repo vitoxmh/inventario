@@ -4,7 +4,7 @@ import Header from '../components/Header/Header'
 import ImageSlider from '../components/ImageSlider/ImageSlider'
 import './juegoDetalle.scss'
 import Breadcrumb from '../components/Breadcrumb/Breadcrumb';
-import { API_URL } from '../config/api';
+import { API_URL, apiFetch } from '../config/api';
 
 export default function JuegoDetalle() {
 
@@ -15,18 +15,19 @@ export default function JuegoDetalle() {
 
 useEffect(() => {
     // Juego
-    fetch(`${API_URL}/games/?id=${id}`)
+    apiFetch(`/games/?id=${id}`)
       .then(r => r.json())
-      .then((data) => {
+      .then((json) => {
+        const data = json.data;
         setJuego(data);
         document.title = data.titulo || 'Detalle Juego';
       });
 
 
         // Imágenes
-    fetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=4`)
+    apiFetch(`/imagenes/?juego_id=${id_imagen}&type=4`)
       .then(r => r.json())
-      .then(setImagenes);
+      .then(json => setImagenes(json.data || []));
 
 
   }, [id]);

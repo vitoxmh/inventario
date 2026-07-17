@@ -29,7 +29,7 @@ switch ($method) {
         deleteAccesorio($id);
         break;
     default:
-        jsonResponse(['error' => 'Method not allowed'], 405);
+        errorResponse('Method not allowed', 405);
 }
 
 function getAccesorio($id) {
@@ -41,9 +41,9 @@ function getAccesorio($id) {
     $accesorio = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$accesorio) {
-        jsonResponse(['error' => 'Accesorio no encontrado'], 404);
+        errorResponse('Accesorio no encontrado', 404);
     }
-    jsonResponse($accesorio);
+    successResponse($accesorio);
 }
 
 function getLastAccesorios() {
@@ -61,7 +61,7 @@ function getLastAccesorios() {
         FROM accesorios
         ORDER BY accesorios.created_at DESC
         LIMIT 10");
-    jsonResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
+    successResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
 function listAccesorios() {
@@ -86,7 +86,8 @@ function listAccesorios() {
                 ORDER BY accesorios.created_at DESC 
                 LIMIT :limit OFFSET :offset";
     
-    jsonResponse(getPaginatedResponse($pdo, $countSql, $dataSql, [], $search, $limit, $offset));
+    $result = getPaginatedResponse($pdo, $countSql, $dataSql, [], $search, $limit, $offset);
+    paginatedResponse($result['data'], $result['pagination']);
 }
 
 function createAccesorio() {
@@ -110,7 +111,7 @@ function createAccesorio() {
     ]);
     
     $id = $pdo->lastInsertId();
-    jsonResponse(['id' => $id, 'id_imagen' => $id_imagen, 'message' => 'Accesorio creado correctamente'], 201);
+    successResponse(['id' => $id, 'id_imagen' => $id_imagen], 'Accesorio creado correctamente', 201);
 }
 
 function updateAccesorio($id) {
@@ -133,7 +134,7 @@ function updateAccesorio($id) {
         $id
     ]);
     
-    jsonResponse(['message' => 'Accesorio actualizado correctamente']);
+    successResponse(null, 'Accesorio actualizado correctamente');
 }
 
 function deleteAccesorio($id) {
@@ -143,5 +144,5 @@ function deleteAccesorio($id) {
     
     $stmt = $pdo->prepare("DELETE FROM accesorios WHERE id = ?");
     $stmt->execute([$id]);
-    jsonResponse(['message' => 'Accesorio eliminado correctamente']);
+    successResponse(null, 'Accesorio eliminado correctamente');
 }

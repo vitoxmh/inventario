@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from '../../config/api';
 import { useState, useEffect } from "react";
 import './FormJuego.scss'
 
@@ -60,7 +61,7 @@ export default function FormPlataforma({ onSuccess, plataformaEditar = null }) {
 
       if (!plataformaEditar) return;
 
-      fetch(`http://localhost:8080/api/imagenes/?juego_id=${plataformaEditar.id_imagen}`)
+      apiFetch(`/imagenes/?juego_id=${plataformaEditar.id_imagen}`)
         .then(r => r.json())
         .then(setImagenesExistentes);
 
@@ -94,11 +95,10 @@ const onChange = (e) => {
         id_imagen = plataformaEditar.id_imagen;
 
 
-        const res = await fetch(
-          `http://localhost:8080/api/plataformas/${plataformaId}/`,
+        const res = await apiFetch(
+          `/plataformas/${plataformaId}/`,
           {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(form)
           }
         );
@@ -106,9 +106,8 @@ const onChange = (e) => {
         if (!res.ok) throw new Error("Error al editar el juego");
       } else {
         // CREAR
-        const res = await fetch("http://localhost:8080/api/plataformas/", {
+        const res = await apiFetch("/plataformas/", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(form)
         });
 
@@ -130,8 +129,8 @@ const onChange = (e) => {
           fd.append("imagenes[]", img);
         }
 
-        const imgRes = await fetch(
-          "http://localhost:8080/api/imagenes/",
+        const imgRes = await apiFetch(
+          "/imagenes/",
           {
             method: "POST",
             body: fd
@@ -197,7 +196,7 @@ const onChange = (e) => {
                 {imagenesExistentes.map(img => (
                   <img
                     key={img.id}
-                    src={`http://localhost:8080/api/imagenes/uploads/${img.archivo}`}
+                    src={`${API_URL}/imagenes/uploads/${img.archivo}`}
                     alt=""
                     style={{
                       width: 100,

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Modal from "../components/Modal/Modal";
 import FormJuego from "../components/FormJuego/FormJuego";
 import Tabla from "../components/Tabla/Tabla";
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
 
 export default function JuegosPage() {
 
@@ -11,9 +11,9 @@ export default function JuegosPage() {
   const [juegos, setJuegos] = useState([]);
 
   const cargarJuegos = () => {
-    fetch(`${API_URL}/games/`)
+    apiFetch(`/games/`)
       .then(r => r.json())
-      .then(setJuegos);
+      .then(json => setJuegos(json.data || []));
   };
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function JuegosPage() {
         }}
         onDelete={(juego) => {
           if (window.confirm(`¿Eliminar el juego "${juego.titulo}"?`)) {
-            fetch(`${API_URL}/games/${juego.id}/`, {
+            apiFetch(`/games/${juego.id}/`, {
               method: "DELETE"
             })
             .then(r => {

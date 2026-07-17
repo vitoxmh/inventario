@@ -2,7 +2,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import Header from '../../components/Header/Header';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
 
 export default function DetalleAccesorio() {
     const { id, id_imagen } = useParams();
@@ -13,20 +13,21 @@ export default function DetalleAccesorio() {
     const dialogRef = useRef(null);
 
     useEffect(() => {
-        fetch(`${API_URL}/accesorios/?id=${id}`)
+        apiFetch(`/accesorios/?id=${id}`)
             .then(r => r.json())
-            .then((data) => {
+            .then((json) => {
+                const data = json.data;
                 setAccesorio(data);
                 document.title = data.nombre || 'Detalle Accesorio';
             });
 
-        fetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
+        apiFetch(`/imagenes/?juego_id=${id_imagen}&type=all`)
             .then(r => r.json())
             .then(setImagenes);
 
-        fetch(`${API_URL}/games/plataformas.php`)
+        apiFetch(`/games/plataformas.php`)
             .then(r => r.json())
-            .then(setPlataformas);
+            .then((json) => setPlataformas(json.data));
     }, [id, id_imagen]);
 
     if (!accesorio) return <p>Cargando...</p>;
@@ -35,12 +36,12 @@ export default function DetalleAccesorio() {
     const plataformaNombre = plataformas.find(p => p.id == accesorio.plataforma)?.nombre || accesorio.plataforma || '-';
 
     const deleteImage = (imgId) => {
-        fetch(`${API_URL}/imagenes/${imgId}/`, {
+        apiFetch(`/imagenes/${imgId}/`, {
             method: 'DELETE',
         })
         .then(r => r.json())
-        .then(data => {
-            if (data.ok) {
+        .then(json => {
+            if (json.success) {
                 setImagenes(imagenes.filter(imagen => imagen.id !== imgId));
             }
         });
@@ -49,7 +50,7 @@ export default function DetalleAccesorio() {
     const deleteAccesorio = () => {
         if (!window.confirm("¿Estás seguro de eliminar este accesorio?")) return;
         
-        fetch(`${API_URL}/accesorios/${id}/`, {
+        apiFetch(`/accesorios/${id}/`, {
             method: 'DELETE',
         })
         .then(r => r.json())

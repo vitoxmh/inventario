@@ -12,7 +12,7 @@ export default function Plataformas() {
     const cargarPlataformas = () => {
         apiFetch('/plataformas/')
         .then(r => r.json())
-        .then(setPlataformas);
+        .then(json => setPlataformas(Array.isArray(json.data) ? json.data : []));
     };
 
     useEffect(() => {

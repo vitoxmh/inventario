@@ -1,7 +1,7 @@
 import './FormNewGame.scss'
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { API_URL } from '../../config/api'; 
+import { API_URL, apiFetch } from '../../config/api';
 
 export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEditar = [] }) {
 
@@ -87,13 +87,9 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
 
     /* 🔹 Cargar plataformas */
     useEffect(() => {
-        fetch(`${API_URL}/games/plataformas.php`,
-            {
-                method: "GET",
-                headers: { "Content-Type": "application/json" }
-            })
+        apiFetch(`/games/plataformas.php`)
         .then(r => r.json())
-        .then(setPlataformas);
+        .then(json => setPlataformas(Array.isArray(json.data) ? json.data : []));
     }, []);
 
 
@@ -152,10 +148,9 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
      
          if (juegoEditar){
 
-             const res = await fetch(`${API_URL}/games/${juegoEditar.id_juego}/`,
+             const res = await apiFetch(`/games/${juegoEditar.id_juego}/`,
             {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form)
             }
             );
@@ -164,15 +159,15 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
 
         }else{
 
-            const res = await fetch(`${API_URL}/games/`, {
+            const res = await apiFetch(`/games/`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form)
             });
 
             if (!res.ok) throw new Error("Error al crear el juego");
 
-            data = await res.json();
+            const json = await res.json();
+            data = json.data;
 
             
 
@@ -190,7 +185,7 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
             fd.append("juego_id", juegoId);
             fd.append("tipo", '0');
 
-                const imgRes = await fetch(`${API_URL}/imagenes/`, {
+                const imgRes = await apiFetch(`/imagenes/`, {
                     method: "POST",
                     body: fd
                 });
@@ -207,7 +202,7 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
             fd.append("juego_id", juegoId);
             fd.append("tipo", '1');
 
-                const imgRes = await fetch(`${API_URL}/imagenes/`, {
+                const imgRes = await apiFetch(`/imagenes/`, {
                     method: "POST",
                     body: fd
                 });
@@ -236,7 +231,7 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
                 fd.append("juego_id", juegoId);
                 fd.append("tipo", '4');
 
-                const imgRes = await fetch(`${API_URL}/imagenes/`, {
+                const imgRes = await apiFetch(`/imagenes/`, {
                     method: "POST",
                     body: fd
                 });
@@ -254,7 +249,7 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
             fd.append("juego_id", juegoId);
             fd.append("tipo", '2');
 
-                const imgRes = await fetch(`${API_URL}/imagenes/`, {
+                const imgRes = await apiFetch(`/imagenes/`, {
                     method: "POST",
                     body: fd
                 });
@@ -269,7 +264,7 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
             fd.append("juego_id", juegoId);
             fd.append("tipo", '3');
 
-                const imgRes = await fetch(`${API_URL}/imagenes/`, {
+                const imgRes = await apiFetch(`/imagenes/`, {
                     method: "POST",
                     body: fd
                 });

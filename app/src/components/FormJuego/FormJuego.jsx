@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from '../../config/api';
 import { useState, useEffect } from "react";
 import './FormJuego.scss'
 
@@ -27,9 +28,9 @@ export default function FormJuego({ onSuccess, juegoEditar = null }) {
 
   /* 🔹 Cargar plataformas */
   useEffect(() => {
-    fetch("http://localhost:8080/api/games/plataformas.php")
+    apiFetch("/games/plataformas.php")
       .then(r => r.json())
-      .then(setPlataformas);
+      .then(json => setPlataformas(Array.isArray(json.data) ? json.data : []));
   }, []);
 
   /* 🔹 Si viene juego a editar, cargar datos */
@@ -56,7 +57,7 @@ export default function FormJuego({ onSuccess, juegoEditar = null }) {
   useEffect(() => {
   if (!juegoEditar) return;
 
-  fetch(`http://localhost:8080/api/imagenes/?juego_id=${juegoEditar.id_imagen}`)
+  apiFetch(`/imagenes/?juego_id=${juegoEditar.id_imagen}`)
     .then(r => r.json())
     .then(setImagenesExistentes);
 }, [juegoEditar]);
@@ -78,11 +79,10 @@ const onChange = (e) => {
       /* 1️⃣ CREAR o EDITAR JUEGO */
       if (juegoEditar) {
         // EDITAR
-        const res = await fetch(
-          `http://localhost:8080/api/games/${juegoEditar.id}/`,
+        const res = await apiFetch(
+          `/games/${juegoEditar.id}/`,
           {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(form)
           }
         );
@@ -91,19 +91,17 @@ const onChange = (e) => {
 
       } else {
         // CREAR
-        const res = await fetch("http://localhost:8080/api/games/", {
+        const res = await apiFetch("/games/", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(form)
         });
 
         if (!res.ok) throw new Error("Error al crear el juego");
 
-        const data = await res.json();
+        const json = await res.json();
       
-        juegoId = data.id;
-
-        
+        juegoId = json.data.id;
+      }
 
       /* 2️⃣ SUBIR IMÁGENES (nuevas) */
       if (imagenes.length > 0) {
@@ -116,8 +114,8 @@ const onChange = (e) => {
           fd.append("imagenes[]", img);
         }
 
-        const imgRes = await fetch(
-          "http://localhost:8080/api/imagenes/",
+        const imgRes = await apiFetch(
+          "/imagenes/",
           {
             method: "POST",
             body: fd
@@ -299,7 +297,7 @@ const onChange = (e) => {
                 {imagenesExistentes.map(img => (
                   <img
                     key={img.id}
-                    src={`http://localhost:8080/api/imagenes/uploads/${img.archivo}`}
+                    src={`${API_URL}/imagenes/uploads/${img.archivo}`}
                     alt=""
                     style={{
                       width: 120,

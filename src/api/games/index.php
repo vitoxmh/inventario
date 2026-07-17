@@ -33,7 +33,7 @@ switch ($method) {
         deleteGame($id);
         break;
     default:
-        jsonResponse(['error' => 'Method not allowed'], 405);
+        errorResponse('Method not allowed', 405);
 }
 
 function getGame($id) {
@@ -73,9 +73,9 @@ function getGame($id) {
     $game = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$game) {
-        jsonResponse(['error' => 'Juego no encontrado'], 404);
+        errorResponse('Juego no encontrado', 404);
     }
-    jsonResponse($game);
+    successResponse($game);
 }
 
 function getLastGames() {
@@ -96,7 +96,7 @@ function getLastGames() {
         WHERE juegos.plataforma_id = plataformas.id
         ORDER BY juegos.created_at DESC
         LIMIT 10");
-    jsonResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
+    successResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
 function getGamesByPlatform($platformId) {
@@ -128,7 +128,8 @@ function getGamesByPlatform($platformId) {
                 ORDER BY juegos.created_at DESC 
                 LIMIT :limit OFFSET :offset";
     
-    jsonResponse(getPaginatedResponse($pdo, $countSql, $dataSql, $params, $search, $limit, $offset));
+    $result = getPaginatedResponse($pdo, $countSql, $dataSql, $params, $search, $limit, $offset);
+    paginatedResponse($result['data'], $result['pagination']);
 }
 
 function listGames($favorito = null) {
@@ -161,7 +162,8 @@ function listGames($favorito = null) {
                 ORDER BY juegos.created_at DESC 
                 LIMIT :limit OFFSET :offset";
     
-    jsonResponse(getPaginatedResponse($pdo, $countSql, $dataSql, [], $search, $limit, $offset));
+    $result = getPaginatedResponse($pdo, $countSql, $dataSql, [], $search, $limit, $offset);
+    paginatedResponse($result['data'], $result['pagination']);
 }
 
 function createGame() {
@@ -196,7 +198,7 @@ function createGame() {
         $data['favorito'] ?? 0
     ]);
     
-    jsonResponse(["message" => "Juego creado", "id" => $id_imagen], 201);
+    successResponse(['id' => $id_imagen], 'Juego creado', 201);
 }
 
 function updateGame($id) {
@@ -211,7 +213,7 @@ function updateGame($id) {
     $juego = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$juego) {
-        jsonResponse(['error' => 'Juego no encontrado'], 404);
+        errorResponse('Juego no encontrado', 404);
     }
     
     // Mezclar datos
@@ -268,7 +270,7 @@ function updateGame($id) {
         $id
     ]);
     
-    jsonResponse(["message" => "Juego actualizado"]);
+    successResponse(null, 'Juego actualizado');
 }
 
 function deleteGame($id) {
@@ -278,5 +280,5 @@ function deleteGame($id) {
     
     $stmt = $pdo->prepare("DELETE FROM juegos WHERE id = ?");
     $stmt->execute([$id]);
-    jsonResponse(["message" => "Juego eliminado"]);
+    successResponse(null, 'Juego eliminado');
 }

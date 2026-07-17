@@ -31,7 +31,7 @@ switch ($method) {
         deletePlataforma($id);
         break;
     default:
-        jsonResponse(['error' => 'Method not allowed'], 405);
+        errorResponse('Method not allowed', 405);
 }
 
 function getPlataforma($id) {
@@ -43,9 +43,9 @@ function getPlataforma($id) {
     $plataforma = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$plataforma) {
-        jsonResponse(['error' => 'Plataforma no encontrada'], 404);
+        errorResponse('Plataforma no encontrada', 404);
     }
-    jsonResponse($plataforma);
+    successResponse($plataforma);
 }
 
 function getLastPlataformas() {
@@ -56,7 +56,7 @@ function getLastPlataformas() {
         FROM plataformas p
         ORDER BY p.created_at DESC
         LIMIT 10");
-    jsonResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
+    successResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
 function listPlataformas() {
@@ -69,7 +69,7 @@ function listPlataformas() {
         LEFT JOIN juegos j ON j.plataforma_id = p.id
         GROUP BY p.id
         ORDER BY p.nombre ASC");
-    jsonResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
+    successResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
 function getCountPlataformas() {
@@ -79,7 +79,7 @@ function getCountPlataformas() {
         (SELECT SUM(juegos.valor) FROM juegos WHERE juegos.plataforma_id = plataformas.id) as totalprecio
         FROM plataformas 
         ORDER BY total DESC");
-    jsonResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
+    successResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
 function createPlataforma() {
@@ -95,7 +95,7 @@ function createPlataforma() {
         $id_imagen
     ]);
     
-    jsonResponse(["message" => "Plataforma creada", "id" => $id_imagen], 201);
+    successResponse(['id' => $id_imagen], 'Plataforma creada', 201);
 }
 
 function updatePlataforma($id) {
@@ -111,7 +111,7 @@ function updatePlataforma($id) {
         $id
     ]);
     
-    jsonResponse(["message" => "Plataforma actualizada"]);
+    successResponse(null, 'Plataforma actualizada');
 }
 
 function deletePlataforma($id) {
@@ -121,5 +121,5 @@ function deletePlataforma($id) {
     
     $stmt = $pdo->prepare("DELETE FROM plataformas WHERE id = ?");
     $stmt->execute([$id]);
-    jsonResponse(["message" => "Plataforma eliminada"]);
+    successResponse(null, 'Plataforma eliminada');
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
 
 export default function EditLibro() {
     const navigate = useNavigate();
@@ -30,9 +30,10 @@ export default function EditLibro() {
     const estadoOptions = ["Nuevo", "Usado - Excelente", "Usado - Bueno", "Usado - Aceptable"];
 
     useEffect(() => {
-        fetch(`${API_URL}/libros/?id=${id}`)
+        apiFetch(`${API_URL}/libros/?id=${id}`)
             .then(r => r.json())
-            .then((data) => {
+            .then((json) => {
+                const data = json.data;
                 setForm({
                     titulo: data.titulo || "",
                     autor: data.autor || "",
@@ -46,7 +47,7 @@ export default function EditLibro() {
                 document.title = `Editar ${data.titulo}`;
             });
 
-        fetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
+        apiFetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
             .then(r => r.json())
             .then((data) => {
                 setPortadaActual(data.find(img => img.tipo === "0"));
@@ -80,9 +81,8 @@ export default function EditLibro() {
         e.preventDefault();
 
         try {
-            const res = await fetch(`${API_URL}/libros/${id}/`, {
+            const res = await apiFetch(`${API_URL}/libros/${id}/`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ ...form, id_imagen })
             });
 
@@ -94,7 +94,7 @@ export default function EditLibro() {
                 fd.append("libro_id", id_imagen);
                 fd.append("tipo", "0");
 
-                await fetch(`${API_URL}/imagenes/`, {
+                await apiFetch(`${API_URL}/imagenes/`, {
                     method: "POST",
                     body: fd
                 });
@@ -106,7 +106,7 @@ export default function EditLibro() {
                 fd.append("libro_id", id_imagen);
                 fd.append("tipo", "1");
 
-                await fetch(`${API_URL}/imagenes/`, {
+                await apiFetch(`${API_URL}/imagenes/`, {
                     method: "POST",
                     body: fd
                 });
@@ -118,7 +118,7 @@ export default function EditLibro() {
                 fd.append("libro_id", id_imagen);
                 fd.append("tipo", "2");
 
-                await fetch(`${API_URL}/imagenes/`, {
+                await apiFetch(`${API_URL}/imagenes/`, {
                     method: "POST",
                     body: fd
                 });

@@ -33,15 +33,18 @@ export async function apiFetch(endpoint, options = {}) {
 
                 if (refreshResponse.ok) {
                     const data = await refreshResponse.json();
-                    localStorage.setItem('token', data.access_token);
-                    localStorage.setItem('refreshToken', data.refresh_token);
+                    if (data.success) {
+                        const authData = data.data;
+                        localStorage.setItem('token', authData.access_token);
+                        localStorage.setItem('refreshToken', authData.refresh_token);
 
-                    headers['Authorization'] = `Bearer ${data.access_token}`;
+                        headers['Authorization'] = `Bearer ${authData.access_token}`;
 
-                    response = await fetch(`${API_URL}${endpoint}`, {
-                        ...options,
-                        headers
-                    });
+                        response = await fetch(`${API_URL}${endpoint}`, {
+                            ...options,
+                            headers
+                        });
+                    }
                 }
             } catch {
                 localStorage.removeItem('token');

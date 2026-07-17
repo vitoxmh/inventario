@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
 
 export default function EditAmiibo() {
     const navigate = useNavigate();
@@ -25,9 +25,10 @@ export default function EditAmiibo() {
     const calificacionOptions = ["⭐", "⭐⭐", "⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐⭐⭐"];
 
     useEffect(() => {
-        fetch(`${API_URL}/amiibos/?id=${id}`)
+        apiFetch(`${API_URL}/amiibos/?id=${id}`)
             .then(r => r.json())
-            .then((data) => {
+            .then((json) => {
+                const data = json.data;
                 setForm({
                     titulo: data.titulo || "",
                     anio: data.anio || "",
@@ -39,7 +40,7 @@ export default function EditAmiibo() {
                 document.title = `Editar ${data.titulo}`;
             });
 
-        fetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
+        apiFetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
             .then(r => r.json())
             .then((data) => {
                 setPortadaActual(data.find(img => img.tipo === "0"));
@@ -67,9 +68,8 @@ export default function EditAmiibo() {
         e.preventDefault();
 
         try {
-            const res = await fetch(`${API_URL}/amiibos/${id}/`, {
+            const res = await apiFetch(`${API_URL}/amiibos/${id}/`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ ...form, id_imagen })
             });
 
@@ -81,7 +81,7 @@ export default function EditAmiibo() {
                 fd.append("amiibo_id", id_imagen);
                 fd.append("tipo", "0");
 
-                await fetch(`${API_URL}/imagenes/`, {
+                await apiFetch(`${API_URL}/imagenes/`, {
                     method: "POST",
                     body: fd
                 });
@@ -93,7 +93,7 @@ export default function EditAmiibo() {
                 fd.append("amiibo_id", id_imagen);
                 fd.append("tipo", "1");
 
-                await fetch(`${API_URL}/imagenes/`, {
+                await apiFetch(`${API_URL}/imagenes/`, {
                     method: "POST",
                     body: fd
                 });

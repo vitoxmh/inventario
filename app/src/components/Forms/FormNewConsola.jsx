@@ -1,4 +1,4 @@
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
 import './FormNewGame.scss'
 import { useState, useEffect, useRef } from "react"; 
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
@@ -57,13 +57,9 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
 
 
     useEffect(() => {
-        fetch(`${API_URL}/games/plataformas.php`,
-            {
-                method: "GET",
-                headers: { "Content-Type": "application/json" }
-            })
+        apiFetch(`/games/plataformas.php`)
         .then(r => r.json())
-        .then(setPlataformas);
+        .then(json => setPlataformas(Array.isArray(json.data) ? json.data : []));
     }, []);
 
 
@@ -113,30 +109,30 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
         if(consolaEditar){
 
 
-            const res = await fetch(`${API_URL}/consolas/${consolaEditar.id}/`, {
+            const res = await apiFetch(`/consolas/${consolaEditar.id}/`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form)
             });
 
 
             if (!res.ok) throw new Error("Error al editar la consola");
 
-            data = await res.json();
+            const json = await res.json();
+            data = json.data;
 
 
 
         }else{
 
-         const res = await fetch(`${API_URL}/consolas/`, {
+         const res = await apiFetch(`/consolas/`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form)
             });
 
             if (!res.ok) throw new Error("Error al crear la consola");
 
-            data = await res.json();
+            const json = await res.json();
+            data = json.data;
 
            
         
@@ -154,7 +150,7 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
             fd.append("juego_id", consolaID);
             fd.append("tipo", '0');
 
-                const imgRes = await fetch(`${API_URL}/imagenes/`, {
+                const imgRes = await apiFetch(`/imagenes/`, {
                     method: "POST",
                     body: fd
                 });
@@ -171,7 +167,7 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
             fd.append("juego_id", consolaID);
             fd.append("tipo", '1');
 
-                const imgRes = await fetch(`${API_URL}/imagenes/`, {
+                const imgRes = await apiFetch(`/imagenes/`, {
                     method: "POST",
                     body: fd
                 });
@@ -193,7 +189,7 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
             fd.append("juego_id", consolaID);
             fd.append("tipo", '4');
 
-                const imgRes = await fetch(`${API_URL}/imagenes/`, {
+                const imgRes = await apiFetch(`/imagenes/`, {
                     method: "POST",
                     body: fd
                 });

@@ -8,20 +8,20 @@ require_once __DIR__ . '/../middleware/rate_limit.php';
 checkRateLimit();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    jsonResponse(['error' => 'Método no permitido'], 405);
+    errorResponse('Método no permitido', 405);
 }
 
 $data = getJsonInput();
 
 if (!$data || empty($data['email']) || empty($data['password'])) {
-    jsonResponse(['error' => 'Email y contraseña son requeridos'], 400);
+    errorResponse('Email y contraseña son requeridos', 400);
 }
 
 $email = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
 $password = $data['password'];
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    jsonResponse(['error' => 'Email inválido'], 400);
+    errorResponse('Email inválido', 400);
 }
 
 global $pdo;
@@ -31,11 +31,11 @@ $stmt->execute([$email]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$user || !verifyPassword($password, $user['password'])) {
-    jsonResponse(['error' => 'Credenciales incorrectas'], 401);
+    errorResponse('Credenciales incorrectas', 401);
 }
 
 if (!$user['activo']) {
-    jsonResponse(['error' => 'Cuenta desactivada'], 403);
+    errorResponse('Cuenta desactivada', 403);
 }
 
 $accessToken = jwt_encode([
@@ -50,7 +50,7 @@ $refreshToken = generateRefreshToken();
 $stmt = $pdo->prepare("INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY))");
 $stmt->execute([$user['id'], $refreshToken]);
 
-jsonResponse([
+successResponse([
     'access_token'  => $accessToken,
     'refresh_token' => $refreshToken,
     'token_type'    => 'Bearer',
@@ -61,4 +61,4 @@ jsonResponse([
         'email'  => $user['email'],
         'rol'    => $user['rol']
     ]
-]);
+], null, 200);

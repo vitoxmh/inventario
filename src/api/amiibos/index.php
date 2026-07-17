@@ -29,7 +29,7 @@ switch ($method) {
         deleteAmiibo($id);
         break;
     default:
-        jsonResponse(['error' => 'Method not allowed'], 405);
+        errorResponse('Method not allowed', 405);
 }
 
 function getAmiibo($id) {
@@ -41,9 +41,9 @@ function getAmiibo($id) {
     $amiibo = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$amiibo) {
-        jsonResponse(['error' => 'Amiibo no encontrado'], 404);
+        errorResponse('Amiibo no encontrado', 404);
     }
-    jsonResponse($amiibo);
+    successResponse($amiibo);
 }
 
 function getLastAmiibos() {
@@ -60,7 +60,7 @@ function getLastAmiibos() {
         FROM amiibos
         ORDER BY amiibos.created_at DESC
         LIMIT 10");
-    jsonResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
+    successResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
 function listAmiibos() {
@@ -85,7 +85,8 @@ function listAmiibos() {
                 ORDER BY amiibos.created_at DESC 
                 LIMIT :limit OFFSET :offset";
     
-    jsonResponse(getPaginatedResponse($pdo, $countSql, $dataSql, [], $search, $limit, $offset));
+    $result = getPaginatedResponse($pdo, $countSql, $dataSql, [], $search, $limit, $offset);
+    paginatedResponse($result['data'], $result['pagination']);
 }
 
 function createAmiibo() {
@@ -109,7 +110,7 @@ function createAmiibo() {
     ]);
     
     $id = $pdo->lastInsertId();
-    jsonResponse(['id' => $id, 'id_imagen' => $id_imagen, 'message' => 'Amiibo creado correctamente'], 201);
+    successResponse(['id' => $id, 'id_imagen' => $id_imagen], 'Amiibo creado correctamente', 201);
 }
 
 function updateAmiibo($id) {
@@ -131,7 +132,7 @@ function updateAmiibo($id) {
         $id
     ]);
     
-    jsonResponse(['message' => 'Amiibo actualizado correctamente']);
+    successResponse(null, 'Amiibo actualizado correctamente');
 }
 
 function deleteAmiibo($id) {
@@ -141,5 +142,5 @@ function deleteAmiibo($id) {
     
     $stmt = $pdo->prepare("DELETE FROM amiibos WHERE id = ?");
     $stmt->execute([$id]);
-    jsonResponse(['message' => 'Amiibo eliminado correctamente']);
+    successResponse(null, 'Amiibo eliminado correctamente');
 }

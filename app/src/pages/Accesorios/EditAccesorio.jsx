@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
 
 export default function EditAccesorio() {
     const navigate = useNavigate();
@@ -29,18 +29,18 @@ export default function EditAccesorio() {
     const [plataformaOptions, setPlataformaOptions] = useState([]);
 
     useEffect(() => {
-        fetch(`${API_URL}/games/plataformas.php`, {
+        apiFetch(`${API_URL}/games/plataformas.php`, {
             method: "GET",
-            headers: { "Content-Type": "application/json" }
         })
         .then(r => r.json())
-        .then(setPlataformaOptions);
+        .then(json => setPlataformaOptions(json.data));
     }, []);
 
     useEffect(() => {
-        fetch(`${API_URL}/accesorios/?id=${id}`)
+        apiFetch(`${API_URL}/accesorios/?id=${id}`)
             .then(r => r.json())
-            .then((data) => {
+            .then((json) => {
+                const data = json.data;
                 setForm({
                     nombre: data.nombre || "",
                     tipo: data.tipo || "",
@@ -53,7 +53,7 @@ export default function EditAccesorio() {
                 document.title = `Editar ${data.nombre}`;
             }); 
 
-        fetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
+        apiFetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
             .then(r => r.json())
             .then((data) => {
                 setPortadaActual(data.find(img => img.tipo === "0"));
@@ -87,9 +87,8 @@ export default function EditAccesorio() {
         e.preventDefault();
 
         try {
-            const res = await fetch(`${API_URL}/accesorios/${id}/`, {
+            const res = await apiFetch(`${API_URL}/accesorios/${id}/`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ ...form, id_imagen })
             });
 
@@ -101,7 +100,7 @@ export default function EditAccesorio() {
                 fd.append("juego_id", id_imagen);
                 fd.append("tipo", "0");
 
-                await fetch(`${API_URL}/imagenes/`, {
+                await apiFetch(`${API_URL}/imagenes/`, {
                     method: "POST",
                     body: fd
                 });
@@ -113,7 +112,7 @@ export default function EditAccesorio() {
                 fd.append("juego_id", id_imagen);
                 fd.append("tipo", "1");
 
-                await fetch(`${API_URL}/imagenes/`, {
+                await apiFetch(`${API_URL}/imagenes/`, {
                     method: "POST",
                     body: fd
                 });
@@ -125,7 +124,7 @@ export default function EditAccesorio() {
                 fd.append("juego_id", id_imagen);
                 fd.append("tipo", "2");
 
-                await fetch(`${API_URL}/imagenes/`, {
+                await apiFetch(`${API_URL}/imagenes/`, {
                     method: "POST",
                     body: fd
                 });

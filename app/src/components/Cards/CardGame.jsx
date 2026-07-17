@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import './CardGames.scss'
-import { API_URL } from '../../config/api'; 
+import { API_URL, apiFetch } from '../../config/api';
 import { useState } from 'react';
 
 export default function CardGames({dataGame =null}) {
@@ -17,9 +17,8 @@ export default function CardGames({dataGame =null}) {
     const toggleFavorito = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch(`${API_URL}/games/${dataGame.id}/`, {
+            const res = await apiFetch(`/games/${dataGame.id}/`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...dataGame, favorito: !favorito })
             });
             if (res.ok) {

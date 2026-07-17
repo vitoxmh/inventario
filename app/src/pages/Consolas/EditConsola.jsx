@@ -4,7 +4,7 @@ import Aside from '../../components/Aside/Aside'
 import FormNewConsola from '../../components/Forms/FormNewConsola'; 
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
  
 export default function EditConsola() {
 
@@ -15,15 +15,16 @@ export default function EditConsola() {
 
 useEffect(() => {
 
-      fetch(`${API_URL}/consolas/?id=${id}`)
+      apiFetch(`${API_URL}/consolas/?id=${id}`)
             .then(r => r.json())
-            .then((data) => {
+            .then((json) => {
+                const data = json.data;
                 setConsola(data);
                 document.title = `Editar ${data.nombre}`;
             });
 
 
-      fetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
+      apiFetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
         .then(r => r.json())
         .then(setImagenes);
 

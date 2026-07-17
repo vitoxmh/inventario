@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import Aside from '../../components/Aside/Aside'
 import Header from '../../components/Header/Header';
 import FormNewGame from '../../components/Forms/FormNewGame';
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
  
 export default function EditarGame() {
 
@@ -14,16 +14,17 @@ export default function EditarGame() {
 
 useEffect(() => {
         // Juego
-        fetch(`${API_URL}/games/?id=${id}`)
+        apiFetch(`${API_URL}/games/?id=${id}`)
         .then(r => r.json())
-        .then((data) => {
+        .then((json) => {
+            const data = json.data;
             setJuego(data);
             document.title = `Editar ${data.titulo}`;
         });
 
 
             // Imágenes
-    fetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
+    apiFetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
     .then(r => r.json())
     .then(setImagenes);
 

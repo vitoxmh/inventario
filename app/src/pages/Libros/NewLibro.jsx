@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
 
 export default function NewLibro() {
     const navigate = useNavigate();
@@ -52,15 +52,15 @@ export default function NewLibro() {
         e.preventDefault();
 
         try {
-            const res = await fetch(`${API_URL}/libros/`, {
+            const res = await apiFetch(`${API_URL}/libros/`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form)
             });
 
             if (!res.ok) throw new Error("Error al crear el libro");
 
-            const data = await res.json();
+            const json = await res.json();
+            const data = json.data;
 
             if (portada) {
                 const fd = new FormData();
@@ -68,7 +68,7 @@ export default function NewLibro() {
                 fd.append("juego_id", data.id_imagen);
                 fd.append("tipo", "0");
 
-                const imgRes = await fetch(`${API_URL}/imagenes/`, {
+                const imgRes = await apiFetch(`${API_URL}/imagenes/`, {
                     method: "POST",
                     body: fd
                 });
@@ -84,7 +84,7 @@ export default function NewLibro() {
                 fd.append("juego_id", data.id_imagen);
                 fd.append("tipo", "1");
 
-                await fetch(`${API_URL}/imagenes/`, {
+                await apiFetch(`${API_URL}/imagenes/`, {
                     method: "POST",
                     body: fd
                 });
@@ -96,7 +96,7 @@ export default function NewLibro() {
                 fd.append("juego_id", data.id_imagen);
                 fd.append("tipo", "2");
 
-                await fetch(`${API_URL}/imagenes/`, {
+                await apiFetch(`${API_URL}/imagenes/`, {
                     method: "POST",
                     body: fd
                 });

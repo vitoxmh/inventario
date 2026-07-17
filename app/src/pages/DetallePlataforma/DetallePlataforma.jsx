@@ -4,7 +4,7 @@ import Cards from '../../components/Cards/CardPaginator';
 import Aside from '../../components/Aside/Aside'
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import { useParams } from "react-router-dom";
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
 
 export default function DetallePlataforma() {
     const [plataforma, setPlataforma] = useState("");
@@ -12,9 +12,10 @@ export default function DetallePlataforma() {
     const {id} = useParams();
 
     useEffect(() => {
-        fetch(`${API_URL}/plataformas/?id=${id}`)
+        apiFetch(`/plataformas/?id=${id}`)
             .then(r => r.json())
-            .then((data) => {
+            .then((json) => {
+                const data = json.data;
                 if (data && data.nombre) {
                     setPlataforma(data.nombre);
                     document.title = data.nombre;
@@ -23,9 +24,9 @@ export default function DetallePlataforma() {
     }, [id]);
 
     useEffect(() => {
-        fetch(`${API_URL}/plataformas/`)
+        apiFetch(`/plataformas/`)
             .then(r => r.json())
-            .then(setPlataformas);
+            .then(json => setPlataformas(Array.isArray(json.data) ? json.data : []));
     }, []);
 
     return (

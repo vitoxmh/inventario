@@ -1,4 +1,4 @@
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
 import { useState, useEffect } from "react";
 import './FormJuego.scss'
 
@@ -20,9 +20,9 @@ export default function FormConsola({ onSuccess, consolaEditar = null }) {
 
     /* 🔹 Cargar plataformas */
   useEffect(() => {
-    fetch(`${API_URL}/games/plataformas.php`)
+    apiFetch("/games/plataformas.php")
       .then(r => r.json())
-      .then(setPlataformas);
+      .then(json => setPlataformas(Array.isArray(json.data) ? json.data : []));
   }, []);
 
 
@@ -48,7 +48,7 @@ export default function FormConsola({ onSuccess, consolaEditar = null }) {
 
     if (!consolaEditar) return;
 
-    fetch(`${API_URL}/imagenes/?juego_id=${consolaEditar.id_imagen}`)
+    apiFetch(`/imagenes/?juego_id=${consolaEditar.id_imagen}`)
       .then(r => r.json())
       .then(setImagenesExistentes);
 
@@ -81,11 +81,10 @@ const onChange = (e) => {
          let consolaId = consolaEditar.id;
          id_imagen = consolaEditar.id_imagen;
 
-        const res = await fetch(
-          `${API_URL}/consolas/${consolaId}/`,
+        const res = await apiFetch(
+          `/consolas/${consolaId}/`,
           {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(form)
           }
         );
@@ -93,9 +92,8 @@ const onChange = (e) => {
         if (!res.ok) throw new Error("Error al editar el juego");
       } else {
         // CREAR
-        const res = await fetch(`${API_URL}/consolas/`, {
+        const res = await apiFetch(`/consolas/`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(form)
         });
 
@@ -116,8 +114,8 @@ const onChange = (e) => {
           fd.append("imagenes[]", img);
         }
 
-        const imgRes = await fetch(
-          `${API_URL}/imagenes/`,
+        const imgRes = await apiFetch(
+          `/imagenes/`,
           {
             method: "POST",
             body: fd

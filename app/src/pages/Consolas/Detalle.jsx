@@ -4,7 +4,7 @@ import Header from '../../components/Header/Header';
 import AsideGame from '../../components/Aside/AsideGame';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import '../DetalleJuego/DetalleJuego.scss';
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
 
 
 export default function Detalle() {
@@ -19,15 +19,16 @@ export default function Detalle() {
     useEffect(() => {
     
             // Galeria
-        fetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
+        apiFetch(`/imagenes/?juego_id=${id_imagen}&type=all`)
         .then(r => r.json())
         .then(setGaleria);
 
 
         // consola
-        fetch(`${API_URL}/consolas/?id=${id}`)
+        apiFetch(`/consolas/?id=${id}`)
         .then(r => r.json())
-        .then((data) => {
+        .then((json) => {
+            const data = json.data;
             setConsola(data);
             document.title = data.nombre || 'Detalle Consola';
         });
@@ -132,8 +133,9 @@ export default function Detalle() {
     async function deleteImage(id) {
         if (!confirm("¿Eliminar imagen?")) return;
         try {
-            const res = await fetch(`${API_URL}/imagenes/?id=${id}`, { method: "DELETE" });
-            if (!res.ok) throw new Error("Error al eliminar");
+            const res = await apiFetch(`/imagenes/?id=${id}`, { method: "DELETE" });
+            const json = await res.json();
+            if (!json.success) throw new Error("Error al eliminar");
             setGaleria(galeria.filter(img => img.id !== id));
         } catch (err) {
             alert(err.message);

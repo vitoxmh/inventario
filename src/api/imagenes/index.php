@@ -17,7 +17,7 @@ if ($method === 'GET') {
     requireAdmin();
     deleteImagen();
 } else {
-    jsonResponse(['error' => 'Método no permitido'], 405);
+    errorResponse('Método no permitido', 405);
 }
 
 define('MAX_FILE_SIZE', 5 * 1024 * 1024);
@@ -31,28 +31,28 @@ define('ALLOWED_EXTENSIONS', ['jpg', 'jpeg', 'png', 'webp', 'gif']);
 
 function validateUploadedFile($file) {
     if ($file['error'] !== UPLOAD_ERR_OK) {
-        jsonResponse(['error' => 'Error en la subida del archivo: ' . $file['error']], 400);
+        errorResponse('Error en la subida del archivo: ' . $file['error'], 400);
     }
     
     if ($file['size'] > MAX_FILE_SIZE) {
-        jsonResponse(['error' => 'El archivo excede el tamaño máximo de 5MB'], 400);
+        errorResponse('El archivo excede el tamaño máximo de 5MB', 400);
     }
     
     $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     if (!in_array($extension, ALLOWED_EXTENSIONS)) {
-        jsonResponse(['error' => 'Extensión no permitida: ' . $extension . '. Permitidas: ' . implode(', ', ALLOWED_EXTENSIONS)], 400);
+        errorResponse('Extensión no permitida: ' . $extension . '. Permitidas: ' . implode(', ', ALLOWED_EXTENSIONS), 400);
     }
     
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mimeType = $finfo->file($file['tmp_name']);
     
     if (!in_array($mimeType, ALLOWED_MIME_TYPES)) {
-        jsonResponse(['error' => 'Tipo de archivo no permitido: ' . $mimeType], 400);
+        errorResponse('Tipo de archivo no permitido: ' . $mimeType, 400);
     }
     
     $imageInfo = @getimagesize($file['tmp_name']);
     if ($imageInfo === false) {
-        jsonResponse(['error' => 'El archivo no es una imagen válida'], 400);
+        errorResponse('El archivo no es una imagen válida', 400);
     }
     
     return true;
@@ -66,7 +66,7 @@ function getImagenes() {
     $type = $_GET["type"] ?? null;
     
     if (!$juego_id && !$amiibo_id) {
-        jsonResponse([]);
+        successResponse([]);
     }
     
     try {
@@ -87,9 +87,9 @@ function getImagenes() {
                 $stmt->execute([$amiibo_id, $type]);
             }
         }
-        jsonResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
+        successResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
     } catch (PDOException $e) {
-        jsonResponse(['error' => 'Error interno del servidor'], 500);
+        errorResponse('Error interno del servidor', 500);
     }
 }
 
@@ -100,11 +100,11 @@ function uploadImagenes() {
     $amiibo_id = $_POST["amiibo_id"] ?? null;
     
     if (empty($juego_id) && empty($amiibo_id)) {
-        jsonResponse(["error" => "juego_id o amiibo_id requerido"], 400);
+        errorResponse("juego_id o amiibo_id requerido", 400);
     }
     
     if (!isset($_FILES['imagenes']) || empty($_FILES['imagenes']['name'][0])) {
-        jsonResponse(["error" => "Archivo de imagen requerido"], 400);
+        errorResponse("Archivo de imagen requerido", 400);
     }
     
     $type = $_POST['tipo'] ?? 'imagen';
@@ -112,7 +112,7 @@ function uploadImagenes() {
     
     $allowedTypes = ['imagen', 'portada', 'contraportada', 'poster', 'logo', '0', '1', '2', '3'];
     if (!in_array($type, $allowedTypes)) {
-        jsonResponse(["error" => "Tipo de imagen inválido"], 400);
+        errorResponse("Tipo de imagen inválido", 400);
     }
     
     $dir = __DIR__ . "/uploads";
@@ -152,12 +152,12 @@ function uploadImagenes() {
                 }
                 $imagenes[] = $nombre;
             } catch (PDOException $e) {
-                jsonResponse(['error' => 'Error al guardar en la base de datos'], 500);
+                errorResponse('Error al guardar en la base de datos', 500);
             }
         }
     }
     
-    jsonResponse(["ok" => true, "imagenes" => $imagenes]);
+    successResponse(['imagenes' => $imagenes], 'Imágenes subidas correctamente');
 }
 
 function deleteImagen() {
@@ -169,8 +169,8 @@ function deleteImagen() {
     try {
         $stmt = $pdo->prepare("UPDATE imagenes SET is_deleted = true WHERE id = ?");
         $stmt->execute([$id]);
-        jsonResponse(["ok" => true]);
+        successResponse(null, 'Imagen eliminada');
     } catch (PDOException $e) {
-        jsonResponse(['error' => 'Error al eliminar la imagen'], 500);
+        errorResponse('Error al eliminar la imagen', 500);
     }
 }

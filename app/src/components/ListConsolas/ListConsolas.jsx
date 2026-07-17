@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Modal from "../Modal/Modal";
 import FormConsola from "../FormJuego/FormConsola";
 import Tabla from "../Tabla/Tabla";
-import { API_URL } from '../../config/api'; 
+import { API_URL, apiFetch } from '../../config/api';
 
 export default function ListConsolas() {
 
@@ -11,9 +11,9 @@ export default function ListConsolas() {
   const [consolas, setConsolas] = useState([]);
 
   const cargarConsolas = () => {
-    fetch(`${API_URL}/consolas/`)
+    apiFetch(`/consolas/`)
       .then(r => r.json())
-      .then(setConsolas);
+      .then(json => setConsolas(json.data || []));
   };
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export default function ListConsolas() {
         }}
         onDelete={(consola) => {
           if (window.confirm(`¿Eliminar la consola "${consola.nombre}"?`)) {
-            fetch(`${API_URL}/consolas/${consola.id}/`, {
+            apiFetch(`/consolas/${consola.id}/`, {
               method: "DELETE"
             })
             .then(r => {

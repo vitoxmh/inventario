@@ -19,7 +19,7 @@ export default function Home() {
     useEffect(() => {
         apiFetch('/plataformas/?action=countPlataformas')
         .then(r => r.json())
-        .then(setPlataformas);
+        .then(json => setPlataformas(Array.isArray(json.data) ? json.data : []));
     }, []);
 
 
@@ -27,19 +27,19 @@ export default function Home() {
      useEffect(() => {
         apiFetch('/games/?action=last')
         .then(r => r.json())
-        .then(setLastGame);
+        .then(json => setLastGame(Array.isArray(json.data) ? json.data : []));
     }, []);
 
     useEffect(() => {
         apiFetch('/consolas/?action=last')
         .then(r => r.json())
-        .then(setLastConsolas);
+        .then(json => setLastConsolas(Array.isArray(json.data) ? json.data : []));
     }, []);
 
     useEffect(() => {
         apiFetch('/amiibos/?action=last')
         .then(r => r.json())
-        .then(setLastAmiibos);
+        .then(json => setLastAmiibos(Array.isArray(json.data) ? json.data : []));
     }, []);
 
 

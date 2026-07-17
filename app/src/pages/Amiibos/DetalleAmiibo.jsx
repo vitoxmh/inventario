@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import Header from '../../components/Header/Header';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import './DetalleAmiibo.scss';
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
 
 export default function DetalleAmiibo() {
     const { id, id_imagen } = useParams();
@@ -13,14 +13,15 @@ export default function DetalleAmiibo() {
     const dialogRef = useRef(null);
 
     useEffect(() => {
-        fetch(`${API_URL}/amiibos/?id=${id}`)
+        apiFetch(`/amiibos/?id=${id}`)
             .then(r => r.json())
-            .then((data) => {
+            .then((json) => {
+                const data = json.data;
                 setAmiibo(data);
                 document.title = data.titulo || 'Detalle Amiibo';
             });
 
-        fetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
+        apiFetch(`/imagenes/?juego_id=${id_imagen}&type=all`)
             .then(r => r.json())
             .then(setImagenes);
     }, [id, id_imagen]);
@@ -31,12 +32,12 @@ export default function DetalleAmiibo() {
     const contraportada = imagenes.find(img => img.tipo === "1");
 
     const deleteImage = (imgId) => {
-        fetch(`${API_URL}/imagenes/${imgId}/`, {
+        apiFetch(`/imagenes/${imgId}/`, {
             method: 'DELETE',
         })
         .then(r => r.json())
-        .then(data => {
-            if (data.ok) {
+        .then(json => {
+            if (json.success) {
                 setImagenes(imagenes.filter(imagen => imagen.id !== imgId));
             }
         });
@@ -45,7 +46,7 @@ export default function DetalleAmiibo() {
     const deleteAmiibo = () => {
         if (!window.confirm("¿Estás seguro de eliminar este amiibo?")) return;
         
-        fetch(`${API_URL}/amiibos/${id}/`, {
+        apiFetch(`/amiibos/${id}/`, {
             method: 'DELETE',
         })
         .then(r => r.json())

@@ -29,7 +29,7 @@ switch ($method) {
         deleteConsola($id);
         break;
     default:
-        jsonResponse(['error' => 'Method not allowed'], 405);
+        errorResponse('Method not allowed', 405);
 }
 
 function getConsola($id) {
@@ -59,9 +59,9 @@ function getConsola($id) {
     $consola = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$consola) {
-        jsonResponse(['error' => 'Consola no encontrada'], 404);
+        errorResponse('Consola no encontrada', 404);
     }
-    jsonResponse($consola);
+    successResponse($consola);
 }
 
 function getLastConsolas() {
@@ -82,7 +82,7 @@ function getLastConsolas() {
         JOIN plataformas p ON c.plataforma_id = p.id
         ORDER BY c.created_at DESC
         LIMIT 10");
-    jsonResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
+    successResponse($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
 function listConsolas() {
@@ -110,7 +110,8 @@ function listConsolas() {
                 ORDER BY consolas.created_at DESC 
                 LIMIT :limit OFFSET :offset";
     
-    jsonResponse(getPaginatedResponse($pdo, $countSql, $dataSql, [], $search, $limit, $offset));
+    $result = getPaginatedResponse($pdo, $countSql, $dataSql, [], $search, $limit, $offset);
+    paginatedResponse($result['data'], $result['pagination']);
 }
 
 function createConsola() {
@@ -136,7 +137,7 @@ function createConsola() {
         $data['estado'] ?? null
     ]);
     
-    jsonResponse(["message" => "Consola creada", "id" => $id_imagen], 201);
+    successResponse(['id' => $id_imagen], 'Consola creada', 201);
 }
 
 function updateConsola($id) {
@@ -163,7 +164,7 @@ function updateConsola($id) {
         $id
     ]);
     
-    jsonResponse(["message" => "Consola actualizada"]);
+    successResponse(null, 'Consola actualizada');
 }
 
 function deleteConsola($id) {
@@ -173,5 +174,5 @@ function deleteConsola($id) {
     
     $stmt = $pdo->prepare("DELETE FROM consolas WHERE id = ?");
     $stmt->execute([$id]);
-    jsonResponse(["message" => "Consola eliminada"]);
+    successResponse(null, 'Consola eliminada');
 }

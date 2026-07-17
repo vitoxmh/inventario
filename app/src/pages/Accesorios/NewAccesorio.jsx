@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
 
 export default function NewAccesorio() {
     const navigate = useNavigate();
@@ -27,12 +27,11 @@ export default function NewAccesorio() {
     const [plataformaOptions, setPlataformaOptions] = useState([]);
 
     useEffect(() => {
-        fetch(`${API_URL}/games/plataformas.php`, {
+        apiFetch(`${API_URL}/games/plataformas.php`, {
             method: "GET",
-            headers: { "Content-Type": "application/json" }
         })
         .then(r => r.json())
-        .then(setPlataformaOptions);
+        .then(json => setPlataformaOptions(json.data));
     }, []);
 
     const handleDrop = (e, setImagen) => {
@@ -60,15 +59,15 @@ export default function NewAccesorio() {
         e.preventDefault();
 
         try {
-            const res = await fetch(`${API_URL}/accesorios/`, {
+            const res = await apiFetch(`${API_URL}/accesorios/`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form)
             });
 
             if (!res.ok) throw new Error("Error al crear el accesorio");
 
-            const data = await res.json();
+            const json = await res.json();
+            const data = json.data;
 
             if (portada) {
                 const fd = new FormData();
@@ -76,7 +75,7 @@ export default function NewAccesorio() {
                 fd.append("juego_id", data.id_imagen);
                 fd.append("tipo", "0");
 
-                const imgRes = await fetch(`${API_URL}/imagenes/`, {
+                const imgRes = await apiFetch(`${API_URL}/imagenes/`, {
                     method: "POST",
                     body: fd
                 });
@@ -92,7 +91,7 @@ export default function NewAccesorio() {
                 fd.append("accesorio_id", data.id_imagen);
                 fd.append("tipo", "1");
 
-                await fetch(`${API_URL}/imagenes/`, {
+                await apiFetch(`${API_URL}/imagenes/`, {
                     method: "POST",
                     body: fd
                 });
@@ -104,7 +103,7 @@ export default function NewAccesorio() {
                 fd.append("accesorio_id", data.id_imagen);
                 fd.append("tipo", "2");
 
-                await fetch(`${API_URL}/imagenes/`, {
+                await apiFetch(`${API_URL}/imagenes/`, {
                     method: "POST",
                     body: fd
                 });

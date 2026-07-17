@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
 
 export default function NewAmiiboYFigura() {
     const navigate = useNavigate();
@@ -43,15 +43,15 @@ export default function NewAmiiboYFigura() {
         e.preventDefault();
 
         try {
-            const res = await fetch(`${API_URL}/amiibos/`, {
+            const res = await apiFetch(`${API_URL}/amiibos/`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form)
             });
 
             if (!res.ok) throw new Error("Error al crear el amiibo/figura");
             
-            const data = await res.json();
+            const json = await res.json();
+            const data = json.data;
 
             if (portada) {
                 const fd = new FormData();
@@ -59,7 +59,7 @@ export default function NewAmiiboYFigura() {
                 fd.append("juego_id", data.id_imagen);
                 fd.append("tipo", "0");
 
-                const imgRes = await fetch(`${API_URL}/imagenes/`, {
+                const imgRes = await apiFetch(`${API_URL}/imagenes/`, {
                     method: "POST",
                     body: fd
                 });
@@ -75,7 +75,7 @@ export default function NewAmiiboYFigura() {
                 fd.append("juego_id", data.id_imagen);
                 fd.append("tipo", "1");
 
-                const imgRes = await fetch(`${API_URL}/imagenes/`, {
+                const imgRes = await apiFetch(`${API_URL}/imagenes/`, {
                     method: "POST",
                     body: fd
                 });

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import "./CardPaginator.scss";
-import { API_URL } from '../../config/api'; 
+import { API_URL, apiFetch } from '../../config/api';
  
 export default function CardAmiibos({
   apiEndpoint = `${API_URL}/amiibos/`,
@@ -26,7 +26,7 @@ export default function CardAmiibos({
     });
 
     try {
-      const resp = await fetch(`${apiEndpoint}?${params}`);
+      const resp = await apiFetch(`${apiEndpoint}?${params}`);
       const data = await resp.json();
       setItems(data.data || []);
       setTotalPaginas(data.pagination?.totalPages || 0);

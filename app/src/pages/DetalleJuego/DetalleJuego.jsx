@@ -4,7 +4,7 @@ import Header from '../../components/Header/Header';
 import AsideGame from '../../components/Aside/AsideGame';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import './DetalleJuego.scss';
-import { API_URL } from '../../config/api';
+import { API_URL, apiFetch } from '../../config/api';
 
 export default function DetalleJuego() {  
 
@@ -21,7 +21,7 @@ export default function DetalleJuego() {
   
     useEffect(() => {
         // Galeria
-        fetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
+        apiFetch(`/imagenes/?juego_id=${id_imagen}&type=all`)
         .then(r => r.json())
         .then((data) => {
             setGaleria(data);
@@ -31,9 +31,10 @@ export default function DetalleJuego() {
 
 
         // Juego
-        fetch(`${API_URL}/games/?id=${id}`)
+        apiFetch(`/games/?id=${id}`)
         .then(r => r.json())
-        .then((data) => {
+        .then((json) => {
+            const data = json.data;
             setJuego(data);
             setFavorito(data.favorito || false);
             document.title = data.titulo || 'Detalle Juego';
@@ -43,9 +44,8 @@ export default function DetalleJuego() {
 
     const toggleFavorito = async () => {
         try {
-            const res = await fetch(`${API_URL}/games/${id}/`, {
+            const res = await apiFetch(`/games/${id}/`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...juego, favorito: !favorito })
             });
             if (res.ok) {
@@ -69,13 +69,13 @@ export default function DetalleJuego() {
     const deleteImage = (id) => {
 
    
-        fetch(`${API_URL}/imagenes/${id}/`, {
+        apiFetch(`/imagenes/${id}/`, {
             method: 'DELETE',
         })
         .then(r => r.json())
-        .then(data => {
+        .then(json => {
 
-                if (data.ok) {
+                if (json.success) {
                     setGaleria(galeria.filter(imagen => imagen.id !== id));
                 }
   
