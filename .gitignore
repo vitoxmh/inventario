@@ -32,4 +32,7 @@ Thumbs.db
 mysql_data/
 mysql_dev_data/
 mysql_prod_data/
+
+
 src/api/imagenes/uploads/*
+!src/api/imagenes/uploads/.gitkeep
