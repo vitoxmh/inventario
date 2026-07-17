@@ -23,7 +23,7 @@ export default function DetalleLibro() {
 
         apiFetch(`/imagenes/?juego_id=${id_imagen}&type=all`)
             .then(r => r.json())
-            .then(setImagenes);
+            .then(json => setImagenes(json.data || []));
     }, [id, id_imagen]);
 
     if (!libro) return <p>Cargando...</p>;

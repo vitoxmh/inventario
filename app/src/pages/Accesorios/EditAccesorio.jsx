@@ -55,7 +55,8 @@ export default function EditAccesorio() {
 
         apiFetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
             .then(r => r.json())
-            .then((data) => {
+            .then((json) => {
+                const data = json.data || [];
                 setPortadaActual(data.find(img => img.tipo === "0"));
                 setContraportadaActual(data.find(img => img.tipo === "1"));
                 setMasImagenesActuales(data.filter(img => img.tipo === "2"));

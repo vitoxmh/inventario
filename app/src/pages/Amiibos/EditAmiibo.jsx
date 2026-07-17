@@ -42,7 +42,8 @@ export default function EditAmiibo() {
 
         apiFetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
             .then(r => r.json())
-            .then((data) => {
+            .then((json) => {
+                const data = json.data || [];
                 setPortadaActual(data.find(img => img.tipo === "0"));
                 setContraportadaActual(data.find(img => img.tipo === "1"));
             });

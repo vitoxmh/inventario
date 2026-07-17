@@ -23,7 +23,7 @@ export default function DetalleAccesorio() {
 
         apiFetch(`/imagenes/?juego_id=${id_imagen}&type=all`)
             .then(r => r.json())
-            .then(setImagenes);
+            .then(json => setImagenes(json.data || []));
 
         apiFetch(`/games/plataformas.php`)
             .then(r => r.json())

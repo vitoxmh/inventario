@@ -23,7 +23,7 @@ export default function DetalleAmiibo() {
 
         apiFetch(`/imagenes/?juego_id=${id_imagen}&type=all`)
             .then(r => r.json())
-            .then(setImagenes);
+            .then(json => setImagenes(json.data || []));
     }, [id, id_imagen]);
 
     if (!amiibo) return <p>Cargando...</p>;
