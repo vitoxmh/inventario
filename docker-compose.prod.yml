@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./src:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - app-network
+
+  php:
+    build: ./docker/php
+    container_name: php-prod
+    restart: always
+    volumes:
+      - ./src:/var/www/html
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_HOST=mysql
+      - DB_NAME=${DB_NAME:-videojuegos}
+      - DB_USER=${DB_USER:-app}
+      - DB_PASSWORD=${DB_PASSWORD:-app}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRY=${JWT_EXPIRY:-900}
+      - REFRESH_EXPIRY=${REFRESH_EXPIRY:-604800}
+      - JWT_ISSUER=${JWT_ISSUER:-inventario-api}
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-prod
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-videojuegos}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${DB_USER:-app}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-app}
+    volumes:
+      - mysql_prod_data:/var/lib/mysql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_prod_data:

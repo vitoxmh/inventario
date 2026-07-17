@@ -1,9 +1,13 @@
 <?php
 
-define('JWT_SECRET', 'xK#9mP$2vL!nQ@7wR#4tY@8uI@3oP@6aS@1dF@5gH');
-define('JWT_EXPIRY', 900);
-define('REFRESH_EXPIRY', 604800);
-define('JWT_ISSUER', 'inventario-api');
+require_once __DIR__ . '/env.php';
+
+loadEnv();
+
+define('JWT_SECRET', env('JWT_SECRET', 'xK#9mP$2vL!nQ@7wR#4tY@8uI@3oP@6aS@1dF@5gH'));
+define('JWT_EXPIRY', env('JWT_EXPIRY', 900));
+define('REFRESH_EXPIRY', env('REFRESH_EXPIRY', 604800));
+define('JWT_ISSUER', env('JWT_ISSUER', 'inventario-api'));
 
 function base64url_encode($data) {
     return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');

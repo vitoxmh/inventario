@@ -1,10 +1,9 @@
 version: "3.9"
 
-# Base configuration - use docker-compose.dev.yml or docker-compose.prod.yml for specific environments
 services:
   nginx:
     image: nginx:alpine
-    container_name: nginx
+    container_name: nginx-dev
     ports:
       - "8080:80"
     volumes:
@@ -17,23 +16,34 @@ services:
 
   php:
     build: ./docker/php
-    container_name: php
+    container_name: php-dev
     volumes:
       - ./src:/var/www/html
+    environment:
+      - APP_ENV=development
+      - APP_DEBUG=true
+      - DB_HOST=mysql
+      - DB_NAME=videojuegos
+      - DB_USER=app
+      - DB_PASSWORD=app
+      - JWT_SECRET=xK#9mP$2vL!nQ@7wR#4tY@8uI@3oP@6aS@1dF@5gH
+      - JWT_EXPIRY=900
+      - REFRESH_EXPIRY=604800
+      - JWT_ISSUER=inventario-api
     networks:
       - app-network
 
   mysql:
     image: mysql:8.0
-    container_name: mysql
+    container_name: mysql-dev
     restart: always
     environment:
-      MYSQL_DATABASE: ${DB_NAME:-videojuegos}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
-      MYSQL_USER: ${DB_USER:-app}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-app}
+      MYSQL_DATABASE: videojuegos
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: app
+      MYSQL_PASSWORD: app
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mysql_dev_data:/var/lib/mysql
     ports:
       - "3306:3306"
     networks:
@@ -41,12 +51,12 @@ services:
 
   phpmyadmin:
     image: phpmyadmin
-    container_name: phpmyadmin
+    container_name: phpmyadmin-dev
     ports:
       - "8081:80"
     environment:
       PMA_HOST: mysql
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_ROOT_PASSWORD: root
     networks:
       - app-network
 
@@ -55,4 +65,4 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data:
+  mysql_dev_data:

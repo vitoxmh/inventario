@@ -23,7 +23,8 @@ export default function DetalleJuego() {
         // Galeria
         apiFetch(`/imagenes/?juego_id=${id_imagen}&type=all`)
         .then(r => r.json())
-        .then((data) => {
+        .then((json) => {
+            const data = json.data || [];
             setGaleria(data);
             const logoImg = data.find(img => img.tipo === "3");
             if (logoImg) setLogo(logoImg);
