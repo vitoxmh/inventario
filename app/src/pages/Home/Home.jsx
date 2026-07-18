@@ -15,6 +15,8 @@ export default function Home() {
     const [lastGame, setLastGame] = useState([]);
     const [lastConsolas, setLastConsolas] = useState([]);
     const [lastAmiibos, setLastAmiibos] = useState([]);
+    const [lastLibros, setLastLibros] = useState([]);
+    const [lastAccesorios, setLastAccesorios] = useState([]);
 
     useEffect(() => {
         apiFetch('/plataformas/?action=countPlataformas')
@@ -40,6 +42,18 @@ export default function Home() {
         apiFetch('/amiibos/?action=last')
         .then(r => r.json())
         .then(json => setLastAmiibos(Array.isArray(json.data) ? json.data : []));
+    }, []);
+
+    useEffect(() => {
+        apiFetch('/libros/?action=last')
+        .then(r => r.json())
+        .then(json => setLastLibros(Array.isArray(json.data) ? json.data : []));
+    }, []);
+
+    useEffect(() => {
+        apiFetch('/accesorios/?action=last')
+        .then(r => r.json())
+        .then(json => setLastAccesorios(Array.isArray(json.data) ? json.data : []));
     }, []);
 
 
@@ -129,6 +143,38 @@ export default function Home() {
                   </Link>
                 ))}
            
+              </div>
+            </div>
+            <div className='list-cards'>
+              <h2 className='list-cards-title'>Ultimos Libros <span></span></h2>
+              <div className='list-cards-container'>
+                {lastLibros.map((libro) => (
+                  <Link to={`/libros/detalle/${libro.id}/${libro.id_imagen}`} key={libro.id}>
+                    <div className='list-cards-container-card'>
+                      <img alt="Libro Cover" className="list-cards-container-card-img" src={libro.portada ? `${API_URL}/imagenes/uploads/${libro.portada}` : "/img/default-game-cover.png"}></img>
+                      <div className='list-cards-container-card-body'>
+                        <h3 className='list-cards-container-card-title'>{libro.titulo}</h3>
+                        <p className='list-cards-container-card-plataform'>{libro.autor}</p>
+                      </div>
+                    </div> 
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div className='list-cards'>
+              <h2 className='list-cards-title'>Ultimos Accesorios <span></span></h2>
+              <div className='list-cards-container'>
+                {lastAccesorios.map((accesorio) => (
+                  <Link to={`/accesorios/detalle/${accesorio.id}/${accesorio.id_imagen}`} key={accesorio.id}>
+                    <div className='list-cards-container-card'>
+                      <img alt="Accesorio Cover" className="list-cards-container-card-img" src={accesorio.portada ? `${API_URL}/imagenes/uploads/${accesorio.portada}` : "/img/default-game-cover.png"}></img>
+                      <div className='list-cards-container-card-body'>
+                        <h3 className='list-cards-container-card-title'>{accesorio.nombre}</h3>
+                        <p className='list-cards-container-card-plataform'>{accesorio.tipo}</p>
+                      </div>
+                    </div> 
+                  </Link>
+                ))}
               </div>
             </div>
           </div>    

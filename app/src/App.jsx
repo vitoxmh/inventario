@@ -29,6 +29,7 @@ import NewAccesorio from './pages/Accesorios/NewAccesorio';
 import DetalleAccesorio from './pages/Accesorios/DetalleAccesorio';
 import EditAccesorio from './pages/Accesorios/EditAccesorio';
 import Favoritos from './pages/Favoritos/Favoritos';
+import RecienAgregado from './pages/RecienAgregado/RecienAgregado';
    
 function App() {
 
@@ -63,6 +64,7 @@ function App() {
             <Route path="/accesorios/detalle/:id/:id_imagen/" element={<ProtectedRoute><DetalleAccesorio /></ProtectedRoute>} />
             <Route path="/accesorios/editar/:id/:id_imagen/" element={<ProtectedRoute adminOnly><EditAccesorio /></ProtectedRoute>} />
             <Route path="/favoritos/" element={<ProtectedRoute><Favoritos /></ProtectedRoute>} />
+            <Route path="/recien-agregado/" element={<ProtectedRoute><RecienAgregado /></ProtectedRoute>} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
