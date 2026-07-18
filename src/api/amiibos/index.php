@@ -93,7 +93,13 @@ function createAmiibo() {
     global $pdo;
     
     $data = getJsonInput();
-    validateRequired($data, 'titulo', 'Titulo es requerido');
+    validateRequired($data, 'titulo', 'El título es requerido');
+    validateMaxLength($data, 'titulo', 255, 'El título no puede exceder 255 caracteres');
+    validateMaxLength($data, 'comentario', 1000, 'El comentario no puede exceder 1000 caracteres');
+    validateNumeric($data, 'anio', 'El año debe ser numérico');
+    if (isset($data['anio']) && $data['anio'] !== '' && $data['anio'] !== null) validateRange($data, 'anio', 1900, 2099, 'El año debe estar entre 1900 y 2099');
+    validateNumeric($data, 'precio', 'El precio debe ser numérico');
+    validateRange($data, 'precio', 0, 999999999, 'El precio no es válido');
     
     $id_imagen = generateIdImagen();
     
@@ -118,7 +124,14 @@ function updateAmiibo($id) {
     
     requireId($id, 'ID requerido');
     $data = getJsonInput();
-    validateRequired($data, 'titulo', 'Titulo es requerido');
+    validateRequired($data, 'titulo', 'El título es requerido');
+    validateMaxLength($data, 'titulo', 255, 'El título no puede exceder 255 caracteres');
+    validateMaxLength($data, 'comentario', 1000, 'El comentario no puede exceder 1000 caracteres');
+    if (isset($data['anio']) && $data['anio'] !== '' && $data['anio'] !== null) {
+        validateNumeric($data, 'anio', 'El año debe ser numérico');
+        validateRange($data, 'anio', 1900, 2099, 'El año debe estar entre 1900 y 2099');
+    }
+    validateNumeric($data, 'precio', 'El precio debe ser numérico');
     
     $stmt = $pdo->prepare("UPDATE amiibos SET titulo = ?, anio = ?, estado = ?, calificacion = ?, precio = ?, comentario = ? 
                            WHERE id = ?");

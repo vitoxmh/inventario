@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { API_URL, apiFetch } from '../../config/api';
+import { validateRequired, validateMaxLength, validateNumeric, validateRange } from '../../config/validations';
 
 export default function EditAmiibo() {
     const navigate = useNavigate();
@@ -14,6 +15,7 @@ export default function EditAmiibo() {
         precio: "",
         comentario: ""
     });
+    const [errors, setErrors] = useState({});
     const [portada, setPortada] = useState(null);
     const [contraportada, setContraportada] = useState(null);
     const [portadaActual, setPortadaActual] = useState(null);
@@ -25,7 +27,7 @@ export default function EditAmiibo() {
     const calificacionOptions = ["⭐", "⭐⭐", "⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐⭐⭐"];
 
     useEffect(() => {
-        apiFetch(`${API_URL}/amiibos/?id=${id}`)
+        apiFetch(`/amiibos/?id=${id}`)
             .then(r => r.json())
             .then((json) => {
                 const data = json.data;
@@ -40,7 +42,7 @@ export default function EditAmiibo() {
                 document.title = `Editar ${data.titulo}`;
             });
 
-        apiFetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
+        apiFetch(`/imagenes/?juego_id=${id_imagen}&type=all`)
             .then(r => r.json())
             .then((json) => {
                 const data = json.data || [];
@@ -63,13 +65,36 @@ export default function EditAmiibo() {
     const onChange = (e) => {
         const { name, value } = e.target;
         setForm({ ...form, [name]: value });
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: null }));
+        }
     };
 
     const onSubmit = async (e) => {
         e.preventDefault();
 
+        const newErrors = {};
+        const tituloError = validateRequired(form.titulo) || validateMaxLength(form.titulo, 255);
+        if (tituloError) newErrors.titulo = tituloError;
+        if (form.anio) {
+            const anioError = validateNumeric(form.anio, 'Año') || validateRange(form.anio, 'Año', 1900, 2099);
+            if (anioError) newErrors.anio = anioError;
+        }
+        if (form.precio) {
+            const precioError = validateNumeric(form.precio, 'Precio') || validateRange(form.precio, 'Precio', 0, 999999999);
+            if (precioError) newErrors.precio = precioError;
+        }
+        if (form.comentario) {
+            const comentarioError = validateMaxLength(form.comentario, 1000);
+            if (comentarioError) newErrors.comentario = comentarioError;
+        }
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+
         try {
-            const res = await apiFetch(`${API_URL}/amiibos/${id}/`, {
+            const res = await apiFetch(`/amiibos/${id}/`, {
                 method: "PUT",
                 body: JSON.stringify({ ...form, id_imagen })
             });
@@ -82,7 +107,7 @@ export default function EditAmiibo() {
                 fd.append("amiibo_id", id_imagen);
                 fd.append("tipo", "0");
 
-                await apiFetch(`${API_URL}/imagenes/`, {
+                await apiFetch('/imagenes/', {
                     method: "POST",
                     body: fd
                 });
@@ -94,7 +119,7 @@ export default function EditAmiibo() {
                 fd.append("amiibo_id", id_imagen);
                 fd.append("tipo", "1");
 
-                await apiFetch(`${API_URL}/imagenes/`, {
+                await apiFetch('/imagenes/', {
                     method: "POST",
                     body: fd
                 });
@@ -146,6 +171,7 @@ export default function EditAmiibo() {
                                     onChange={onChange}
                                     required
                                 />
+                                {errors.titulo && <span className="form-field-error">{errors.titulo}</span>}
                             </div>
                             <div>
                                 <label className="game-form-label" htmlFor="anio">Año</label>
@@ -154,9 +180,13 @@ export default function EditAmiibo() {
                                     type="number"
                                     id="anio"
                                     name="anio"
+                                    min="1900"
+                                    max="2099"
+                                    step="1"
                                     value={form.anio}
                                     onChange={onChange}
                                 />
+                                {errors.anio && <span className="form-field-error">{errors.anio}</span>}
                             </div>
                             <div>
                                 <label className="game-form-label" htmlFor="estado">Estado</label>
@@ -199,6 +229,7 @@ export default function EditAmiibo() {
                                     value={form.precio}
                                     onChange={onChange}
                                 />
+                                {errors.precio && <span className="form-field-error">{errors.precio}</span>}
                             </div>
                             <div className="game-form-100">
                                 <label className="game-form-label" htmlFor="comentario">Comentario</label>
@@ -211,6 +242,7 @@ export default function EditAmiibo() {
                                     onChange={onChange}
                                     rows="3"
                                 />
+                                {errors.comentario && <span className="form-field-error">{errors.comentario}</span>}
                             </div>
                         </div>
                     </div>

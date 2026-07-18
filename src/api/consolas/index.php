@@ -118,6 +118,15 @@ function createConsola() {
     global $pdo;
     
     $data = getJsonInput();
+    validateRequired($data, 'nombre', 'El nombre es requerido');
+    validateRequired($data, 'plataforma_id', 'La plataforma es requerida');
+    validateMaxLength($data, 'nombre', 255, 'El nombre no puede exceder 255 caracteres');
+    validateMaxLength($data, 'comentario', 1000, 'El comentario no puede exceder 1000 caracteres');
+    validateMaxLength($data, 'otro', 1000, 'El campo otro no puede exceder 1000 caracteres');
+    validateNumeric($data, 'plataforma_id', 'La plataforma debe ser un número válido');
+    validateNumeric($data, 'valor', 'El valor debe ser numérico');
+    validateRange($data, 'valor', 0, 999999999, 'El valor no es válido');
+    
     $id_imagen = generateIdImagen();
     
     $stmt = $pdo->prepare("INSERT INTO consolas 
@@ -145,6 +154,13 @@ function updateConsola($id) {
     
     requireId($id, 'ID de consola requerido');
     $data = getJsonInput();
+    
+    if (isset($data['nombre'])) validateRequired($data, 'nombre', 'El nombre es requerido');
+    if (isset($data['nombre'])) validateMaxLength($data, 'nombre', 255, 'El nombre no puede exceder 255 caracteres');
+    if (isset($data['comentario'])) validateMaxLength($data, 'comentario', 1000, 'El comentario no puede exceder 1000 caracteres');
+    if (isset($data['otro'])) validateMaxLength($data, 'otro', 1000, 'El campo otro no puede exceder 1000 caracteres');
+    if (isset($data['plataforma_id']) && $data['plataforma_id'] !== '') validateNumeric($data, 'plataforma_id', 'La plataforma debe ser un número válido');
+    if (isset($data['valor']) && $data['valor'] !== '') validateNumeric($data, 'valor', 'El valor debe ser numérico');
     
     $stmt = $pdo->prepare("UPDATE consolas SET 
         plataforma_id = ?, nombre = ?, caja = ?, manuales = ?, carton = ?, valor = ?, comentario = ?, otro = ?, estado = ?, type = ? 

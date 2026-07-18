@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_URL, apiFetch } from '../../config/api';
+import { validateRequired, validateMaxLength, validateNumeric, validateRange } from '../../config/validations';
 
 export default function NewLibro() {
     const navigate = useNavigate();
@@ -18,6 +19,7 @@ export default function NewLibro() {
         comentario: ""
     });
 
+    const [errors, setErrors] = useState({});
     const calificacionOptions = ["⭐", "⭐⭐", "⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐⭐⭐"];
     const [portada, setPortada] = useState(null);
     const [contraportada, setContraportada] = useState(null);
@@ -46,13 +48,35 @@ export default function NewLibro() {
     const onChange = (e) => {
         const { name, value } = e.target;
         setForm({ ...form, [name]: value });
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: null }));
+        }
     };
 
     const onSubmit = async (e) => {
         e.preventDefault();
 
+        const newErrors = {};
+        const tituloError = validateRequired(form.titulo, 'Título') || validateMaxLength(form.titulo, 255, 'Título');
+        if (tituloError) newErrors.titulo = tituloError;
+        const autorError = form.autor ? validateMaxLength(form.autor, 255, 'Autor') : null;
+        if (autorError) newErrors.autor = autorError;
+        const editorialError = form.editorial ? validateMaxLength(form.editorial, 255, 'Editorial') : null;
+        if (editorialError) newErrors.editorial = editorialError;
+        const anioError = form.anio ? validateNumeric(form.anio, 'Año') || validateRange(Number(form.anio), 'Año', 1900, 2099) : null;
+        if (anioError) newErrors.anio = anioError;
+        const precioError = form.precio ? validateNumeric(form.precio, 'Precio') || validateRange(Number(form.precio), 'Precio', 0, 999999999) : null;
+        if (precioError) newErrors.precio = precioError;
+        const comentarioError = form.comentario ? validateMaxLength(form.comentario, 1000, 'Comentario') : null;
+        if (comentarioError) newErrors.comentario = comentarioError;
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+
         try {
-            const res = await apiFetch(`${API_URL}/libros/`, {
+            const res = await apiFetch('/libros/', {
                 method: "POST",
                 body: JSON.stringify(form)
             });
@@ -68,7 +92,7 @@ export default function NewLibro() {
                 fd.append("juego_id", data.id_imagen);
                 fd.append("tipo", "0");
 
-                const imgRes = await apiFetch(`${API_URL}/imagenes/`, {
+                const imgRes = await apiFetch('/imagenes/', {
                     method: "POST",
                     body: fd
                 });
@@ -84,7 +108,7 @@ export default function NewLibro() {
                 fd.append("juego_id", data.id_imagen);
                 fd.append("tipo", "1");
 
-                await apiFetch(`${API_URL}/imagenes/`, {
+                await apiFetch('/imagenes/', {
                     method: "POST",
                     body: fd
                 });
@@ -96,7 +120,7 @@ export default function NewLibro() {
                 fd.append("juego_id", data.id_imagen);
                 fd.append("tipo", "2");
 
-                await apiFetch(`${API_URL}/imagenes/`, {
+                await apiFetch('/imagenes/', {
                     method: "POST",
                     body: fd
                 });
@@ -148,6 +172,7 @@ export default function NewLibro() {
                                     onChange={onChange}
                                     required
                                 />
+                                {errors.titulo && <span className="form-field-error">{errors.titulo}</span>}
                             </div>
                             <div className="game-form-100">
                                 <label className="game-form-label" htmlFor="autor">Autor</label>
@@ -160,6 +185,7 @@ export default function NewLibro() {
                                     value={form.autor}
                                     onChange={onChange}
                                 />
+                                {errors.autor && <span className="form-field-error">{errors.autor}</span>}
                             </div>
                             <div>
                                 <label className="game-form-label" htmlFor="anio">Año</label>
@@ -168,9 +194,13 @@ export default function NewLibro() {
                                     type="number"
                                     id="anio"
                                     name="anio"
+                                    min="1900"
+                                    max="2099"
+                                    step="1"
                                     value={form.anio}
                                     onChange={onChange}
                                 />
+                                {errors.anio && <span className="form-field-error">{errors.anio}</span>}
                             </div>
                             <div>
                                 <label className="game-form-label" htmlFor="editorial">Editorial</label>
@@ -183,6 +213,7 @@ export default function NewLibro() {
                                     value={form.editorial}
                                     onChange={onChange}
                                 />
+                                {errors.editorial && <span className="form-field-error">{errors.editorial}</span>}
                             </div>
                             <div>
                                 <label className="game-form-label" htmlFor="estado">Estado</label>
@@ -225,6 +256,7 @@ export default function NewLibro() {
                                     value={form.precio}
                                     onChange={onChange}
                                 />
+                                {errors.precio && <span className="form-field-error">{errors.precio}</span>}
                             </div>
                             <div className="game-form-100">
                                 <label className="game-form-label" htmlFor="comentario">Comentario</label>
@@ -237,6 +269,7 @@ export default function NewLibro() {
                                     onChange={onChange}
                                     rows="3"
                                 />
+                                {errors.comentario && <span className="form-field-error">{errors.comentario}</span>}
                             </div>
                         </div>
                     </div>

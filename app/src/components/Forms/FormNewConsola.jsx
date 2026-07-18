@@ -2,6 +2,7 @@ import { API_URL, apiFetch } from '../../config/api';
 import './FormNewGame.scss'
 import { useState, useEffect, useRef } from "react"; 
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
+import { validateRequired, validateMaxLength, validateNumeric, validateRange } from '../../config/validations';
 
 export default function FormNewConsola({consolaEditar = null, imagenesEditar = []}) {
 
@@ -13,6 +14,7 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
     const [contraportada, setContraportada] = useState(null);
     const [galeria, setGaleria] = useState(null);
     const estadoOptions = ["Nuevo", "Usado - Excelente", "Usado - Bueno", "Usado - Aceptable"];
+    const [errors, setErrors] = useState({});
 
     const [form, setForm] = useState({
         nombre: "",
@@ -82,6 +84,9 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
         ...form,
         [name]: type === "checkbox" ? (checked ? 1 : 0) : value
         });
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: null }));
+        }
     };
 
 
@@ -102,6 +107,29 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
     const onSubmit = async (e) => {
 
         e.preventDefault();
+
+        const newErrors = {};
+
+        if (!validateRequired(form.nombre)) newErrors.nombre = "El nombre es requerido";
+        else if (!validateMaxLength(form.nombre, 255)) newErrors.nombre = "El nombre no puede exceder 255 caracteres";
+
+        if (!validateRequired(form.plataforma_id)) newErrors.plataforma_id = "La plataforma es requerida";
+
+        if (!validateRequired(form.type)) newErrors.type = "El tipo es requerido";
+
+        if (!validateRequired(form.estado)) newErrors.estado = "El estado es requerido";
+
+        if (!validateRequired(form.valor)) newErrors.valor = "El valor es requerido";
+        else if (!validateNumeric(form.valor)) newErrors.valor = "El valor debe ser numérico";
+
+        if (form.comentario && !validateMaxLength(form.comentario, 1000)) newErrors.comentario = "El comentario no puede exceder 1000 caracteres";
+
+        if (form.otro && !validateMaxLength(form.otro, 1000)) newErrors.otro = "El campo otro no puede exceder 1000 caracteres";
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
 
         let consolaID = null;
         let data = null
@@ -226,6 +254,7 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
                                 onChange={onChange}
                                 required
                                 />
+                                {errors.nombre && <span className="form-field-error">{errors.nombre}</span>}
                             </div>
                             <div>
                                 <label className='game-form-label' htmlFor="plataforma_id">Plataforma</label>
@@ -236,9 +265,10 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
                                 >
                                     <option value="">Seleccionar Plataforma</option>
                                     {plataformas.map(p => (
-                                        <option key={p.id} value={p.id} selected={form.plataforma_id === p.id}>{p.nombre}</option>
-                                    ))} 
+                                        <option key={p.id} value={p.id}>{p.nombre}</option>
+                                    ))}
                                 </select>
+                                {errors.plataforma_id && <span className="form-field-error">{errors.plataforma_id}</span>}
                             </div>
                              <div>
                                 <label className='game-form-label' htmlFor="type">Tipo</label>
@@ -249,9 +279,10 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
                                 >
                                     <option value="">Seleccionar Type</option>
                                     {typeConsola.map(p => (
-                                        <option key={p.id} value={p.id} selected={form.type === p.id}>{p.nombre}</option>
-                                    ))} 
+                                        <option key={p.id} value={p.id}>{p.nombre}</option>
+                                    ))}
                                 </select>
+                                {errors.type && <span className="form-field-error">{errors.type}</span>}
                             </div>
                             <div className='game-form-100'>
                                 <label className='game-form-label' htmlFor="title">Contenido</label>
@@ -297,9 +328,10 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
                                 >
                                     <option value="">Estado</option>
                                     {estadoOptions.map((estado) => (
-                                        <option key={estado} value={estado} selected={form.estado === estado}>{estado}</option>
+                                        <option key={estado} value={estado}>{estado}</option>
                                     ))}
                                 </select>
+                                {errors.estado && <span className="form-field-error">{errors.estado}</span>}
                              </div>
                              <div>
                                 <label className='game-form-label' htmlFor="valor">Valor</label>
@@ -308,6 +340,7 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
                                 onChange={onChange}
                                 required
                                 />
+                                {errors.valor && <span className="form-field-error">{errors.valor}</span>}
                             </div>
                         </div>
                         <div className='game-form-container-inputs'>
@@ -319,6 +352,7 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
                                 onChange={onChange}
                         
                                 />
+                                {errors.comentario && <span className="form-field-error">{errors.comentario}</span>}
                             </div> 
                             <div className='game-form-100'>
                                 <label className='game-form-label' htmlFor="otro">Otro</label>
@@ -327,6 +361,7 @@ export default function FormNewConsola({consolaEditar = null, imagenesEditar = [
                                 onChange={onChange}
                            
                                 />
+                                {errors.otro && <span className="form-field-error">{errors.otro}</span>}
                             </div>  
                         </div>
                         

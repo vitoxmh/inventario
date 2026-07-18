@@ -2,6 +2,7 @@ import './FormNewGame.scss'
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { API_URL, apiFetch } from '../../config/api';
+import { validateRequired, validateMaxLength, validateNumeric, validateRange } from '../../config/validations';
 
 export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEditar = [] }) {
 
@@ -22,6 +23,7 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
         puntuacion: 0
     });
 
+    const [errors, setErrors] = useState({});
     const estadoOptions = ["Nuevo", "Usado - Excelente", "Usado - Bueno", "Usado - Aceptable"];
     const [plataformas, setPlataformas] = useState([]);
     const [portada, setPortada] = useState(null);
@@ -140,6 +142,53 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
     const onSubmit = async (e) => {
 
     e.preventDefault();
+
+    const newErrors = {};
+
+    const tituloErr = validateRequired(form.titulo, 'Título') || validateMaxLength(form.titulo, 255, 'Título');
+    if (tituloErr) newErrors.titulo = tituloErr;
+
+    const plataformaErr = validateRequired(form.plataforma_id, 'Plataforma');
+    if (plataformaErr) newErrors.plataforma_id = plataformaErr;
+
+    const lanzamientoErr = validateRequired(form.lanzamiento, 'Año de lanzamiento') || validateNumeric(form.lanzamiento, 'Año de lanzamiento') || validateRange(form.lanzamiento, 'Año de lanzamiento', 1900, 2099);
+    if (lanzamientoErr) newErrors.lanzamiento = lanzamientoErr;
+
+    const publicadorErr = validateRequired(form.publicador, 'Publicador') || validateMaxLength(form.publicador, 255, 'Publicador');
+    if (publicadorErr) newErrors.publicador = publicadorErr;
+
+    const generoErr = validateRequired(form.genero, 'Género') || validateMaxLength(form.genero, 100, 'Género');
+    if (generoErr) newErrors.genero = generoErr;
+
+    const estadoErr = validateRequired(form.estado, 'Estado');
+    if (estadoErr) newErrors.estado = estadoErr;
+
+    if (form.valor !== "" && form.valor !== undefined) {
+        const valorErr = validateNumeric(form.valor, 'Valor') || validateRange(form.valor, 'Valor', 0, 999999999);
+        if (valorErr) newErrors.valor = valorErr;
+    }
+
+    if (form.puntuacion !== undefined && form.puntuacion !== 0) {
+        const puntuacionErr = validateRange(form.puntuacion, 'Puntuación', 0, 5);
+        if (puntuacionErr) newErrors.puntuacion = puntuacionErr;
+    }
+
+    if (form.comentario !== "" && form.comentario !== undefined) {
+        const comentarioErr = validateMaxLength(form.comentario, 1000, 'Comentario');
+        if (comentarioErr) newErrors.comentario = comentarioErr;
+    }
+
+    if (form.desarrollador !== "" && form.desarrollador !== undefined) {
+        const desarrolladorErr = validateMaxLength(form.desarrollador, 255, 'Desarrollador');
+        if (desarrolladorErr) newErrors.desarrollador = desarrolladorErr;
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return;
+    }
+
+    setErrors({});
 
     try {
 
@@ -292,6 +341,9 @@ export default function FormNewGame({ onSuccess, juegoEditar = null, imagenesEdi
       ...form,
       [name]: type === "checkbox" ? (checked ? 1 : 0) : value
     });
+    if (errors[name]) {
+        setErrors(prev => ({ ...prev, [name]: null }));
+    }
   };
 
 
@@ -331,6 +383,7 @@ return (
                             onChange={onChange}
                             required
                             />
+                            {errors.titulo && <span className="form-field-error">{errors.titulo}</span>}
                         </div>
                         <div>
                             <label className='game-form-label' htmlFor="plataforma_id">Plataforma</label>
@@ -341,9 +394,10 @@ return (
                             >
                                  <option value="">Seleccionar Plataforma</option>
                                 {plataformas.map(p => (
-                                    <option key={p.id} value={p.id} selected={form.plataforma_id === p.id}>{p.nombre}</option>
+                                    <option key={p.id} value={p.id}>{p.nombre}</option>
                                 ))} 
                             </select>
+                            {errors.plataforma_id && <span className="form-field-error">{errors.plataforma_id}</span>}
                         </div>
                         <div>
                             <label className='game-form-label' htmlFor="lanzamiento">Año Lanzamiento</label>
@@ -351,7 +405,11 @@ return (
                              value={form.lanzamiento}
                             onChange={onChange}
                             required
+                            min="1900"
+                            max="2099"
+                            step="1"
                             placeholder='1992' />
+                            {errors.lanzamiento && <span className="form-field-error">{errors.lanzamiento}</span>}
                         </div>
                         <div>
                             <label className='game-form-label' htmlFor="desarrollador">Desarrollador</label>
@@ -359,6 +417,7 @@ return (
                             value={form.desarrollador}
                             onChange={onChange}
                             />
+                            {errors.desarrollador && <span className="form-field-error">{errors.desarrollador}</span>}
                         </div>
                         <div>
                             <label className='game-form-label' htmlFor="publicador">Distribuidors</label>
@@ -367,6 +426,7 @@ return (
                             onChange={onChange}
                             required
                             />
+                            {errors.publicador && <span className="form-field-error">{errors.publicador}</span>}
                         </div> 
                         <div>
                             <label className='game-form-label' htmlFor="genero">Genero</label>
@@ -381,11 +441,12 @@ return (
                                 >
                                 <option value="">Seleccionar género</option>
                                 {generosVideojuegos.map(genero => (
-                                    <option key={genero} value={genero} selected={form.genero === genero}>
+                                    <option key={genero} value={genero}>
                                     {genero}
                                     </option>
                                 ))}
                                 </select>
+                                {errors.genero && <span className="form-field-error">{errors.genero}</span>}
 
                         </div>
                          <div>
@@ -397,9 +458,10 @@ return (
                             >
                                  <option value="">Estado</option>
                                 {estadoOptions.map((estado) => (
-                                    <option key={estado} value={estado} selected={form.estado === estado}>{estado}</option>
+                                    <option key={estado} value={estado}>{estado}</option>
                                 ))}
                             </select>
+                            {errors.estado && <span className="form-field-error">{errors.estado}</span>}
                         </div>
                     </div>
  
@@ -412,6 +474,7 @@ return (
                             value={form.valor}
                             onChange={onChange}
                             />
+                            {errors.valor && <span className="form-field-error">{errors.valor}</span>}
                         </div>
                        
 
@@ -489,6 +552,7 @@ return (
                                 onChange={onChange}
                                 rows="3"
                             />
+                            {errors.comentario && <span className="form-field-error">{errors.comentario}</span>}
                         </div>
                         <div className='game-form-100'>
                             <label className='game-form-label'>Puntuación</label>

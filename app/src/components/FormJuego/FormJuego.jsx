@@ -175,7 +175,7 @@ const onChange = (e) => {
             > 
               <option value="">Región</option>
               {regionOptions.map((region) => (
-                <option key={region} value={region} selected={form.region === region}>{region}</option>
+                <option key={region} value={region}>{region}</option>
               ))}
             </select> 
 
@@ -191,7 +191,7 @@ const onChange = (e) => {
             > 
               <option value="">Formato</option>
               {formatoOptions.map((formato) => (
-                <option key={formato} value={formato} selected={form.formato === formato}>{formato}</option>
+                <option key={formato} value={formato}>{formato}</option>
               ))}
             </select>
 
@@ -207,7 +207,7 @@ const onChange = (e) => {
             > 
               <option value="">Estado</option>
               {estadoOptions.map((estado) => (
-                <option key={estado} value={estado} selected={form.estado === estado}>{estado}</option>
+                <option key={estado} value={estado}>{estado}</option>
               ))}
             </select>
            

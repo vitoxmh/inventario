@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_URL, apiFetch } from '../../config/api';
+import { validateRequired, validateMaxLength, validateNumeric, validateRange } from '../../config/validations';
 
 export default function NewAmiiboYFigura() {
     const navigate = useNavigate();
@@ -15,6 +16,7 @@ export default function NewAmiiboYFigura() {
         precio: "",
         comentario: ""
     });
+    const [errors, setErrors] = useState({});
     const [portada, setPortada] = useState(null);
     const [contraportada, setContraportada] = useState(null);
     const portadaInputRef = useRef(null);
@@ -37,13 +39,36 @@ export default function NewAmiiboYFigura() {
     const onChange = (e) => {
         const { name, value } = e.target;
         setForm({ ...form, [name]: value });
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: null }));
+        }
     };
 
     const onSubmit = async (e) => {
         e.preventDefault();
 
+        const newErrors = {};
+        const tituloError = validateRequired(form.titulo) || validateMaxLength(form.titulo, 255);
+        if (tituloError) newErrors.titulo = tituloError;
+        if (form.anio) {
+            const anioError = validateNumeric(form.anio, 'Año') || validateRange(form.anio, 'Año', 1900, 2099);
+            if (anioError) newErrors.anio = anioError;
+        }
+        if (form.precio) {
+            const precioError = validateNumeric(form.precio, 'Precio') || validateRange(form.precio, 'Precio', 0, 999999999);
+            if (precioError) newErrors.precio = precioError;
+        }
+        if (form.comentario) {
+            const comentarioError = validateMaxLength(form.comentario, 1000);
+            if (comentarioError) newErrors.comentario = comentarioError;
+        }
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+
         try {
-            const res = await apiFetch(`${API_URL}/amiibos/`, {
+            const res = await apiFetch('/amiibos/', {
                 method: "POST",
                 body: JSON.stringify(form)
             });
@@ -59,7 +84,7 @@ export default function NewAmiiboYFigura() {
                 fd.append("juego_id", data.id_imagen);
                 fd.append("tipo", "0");
 
-                const imgRes = await apiFetch(`${API_URL}/imagenes/`, {
+                const imgRes = await apiFetch('/imagenes/', {
                     method: "POST",
                     body: fd
                 });
@@ -75,7 +100,7 @@ export default function NewAmiiboYFigura() {
                 fd.append("juego_id", data.id_imagen);
                 fd.append("tipo", "1");
 
-                const imgRes = await apiFetch(`${API_URL}/imagenes/`, {
+                const imgRes = await apiFetch('/imagenes/', {
                     method: "POST",
                     body: fd
                 });
@@ -131,6 +156,7 @@ export default function NewAmiiboYFigura() {
                                     onChange={onChange}
                                     required
                                 />
+                                {errors.titulo && <span className="form-field-error">{errors.titulo}</span>}
                             </div>
                             <div>
                                 <label className="game-form-label" htmlFor="anio">Año</label>
@@ -139,9 +165,13 @@ export default function NewAmiiboYFigura() {
                                     type="number"
                                     id="anio"
                                     name="anio"
+                                    min="1900"
+                                    max="2099"
+                                    step="1"
                                     value={form.anio}
                                     onChange={onChange}
                                 />
+                                {errors.anio && <span className="form-field-error">{errors.anio}</span>}
                             </div>
                             <div>
                                 <label className="game-form-label" htmlFor="estado">Estado</label>
@@ -184,6 +214,7 @@ export default function NewAmiiboYFigura() {
                                     value={form.precio}
                                     onChange={onChange}
                                 />
+                                {errors.precio && <span className="form-field-error">{errors.precio}</span>}
                             </div>
                             <div className="game-form-100">
                                 <label className="game-form-label" htmlFor="comentario">Comentario</label>
@@ -196,6 +227,7 @@ export default function NewAmiiboYFigura() {
                                     onChange={onChange}
                                     rows="3"
                                 />
+                                {errors.comentario && <span className="form-field-error">{errors.comentario}</span>}
                             </div>
                         </div>
                     </div>

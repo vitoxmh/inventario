@@ -4,7 +4,7 @@ import Aside from '../../components/Aside/Aside'
 import FormNewConsola from '../../components/Forms/FormNewConsola'; 
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { API_URL, apiFetch } from '../../config/api';
+import { apiFetch } from '../../config/api';
  
 export default function EditConsola() {
 
@@ -15,7 +15,7 @@ export default function EditConsola() {
 
 useEffect(() => {
 
-      apiFetch(`${API_URL}/consolas/?id=${id}`)
+      apiFetch(`/consolas/?id=${id}`)
             .then(r => r.json())
             .then((json) => {
                 const data = json.data;
@@ -24,9 +24,9 @@ useEffect(() => {
             });
 
 
-      apiFetch(`${API_URL}/imagenes/?juego_id=${id_imagen}&type=all`)
+      apiFetch(`/imagenes/?juego_id=${id_imagen}&type=all`)
         .then(r => r.json())
-        .then(setImagenes);
+        .then(json => setImagenes(Array.isArray(json.data) ? json.data : []));
 
     
   }, [id, id_imagen]);

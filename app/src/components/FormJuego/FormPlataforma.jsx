@@ -172,7 +172,7 @@ const onChange = (e) => {
             <select  name="fabricante" value={form.fabricante} onChange={onChange} >
               <option value="" disabled>Seleccione un fabricante</option>
               {fabricantes.map((fabricante) => (
-                <option key={fabricante.id} value={fabricante.nombre} selected={form.fabricante === fabricante.nombre}>
+                <option key={fabricante.id} value={fabricante.nombre}>
                   {fabricante.nombre}
                 </option>
               ))}

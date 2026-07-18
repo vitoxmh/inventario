@@ -170,6 +170,20 @@ function createGame() {
     global $pdo;
     
     $data = getJsonInput();
+    validateRequired($data, 'titulo', 'El título es requerido');
+    validateRequired($data, 'plataforma_id', 'La plataforma es requerida');
+    validateMaxLength($data, 'titulo', 255, 'El título no puede exceder 255 caracteres');
+    validateMaxLength($data, 'desarrollador', 255, 'El desarrollador no puede exceder 255 caracteres');
+    validateMaxLength($data, 'publicador', 255, 'El publicador no puede exceder 255 caracteres');
+    validateMaxLength($data, 'genero', 100, 'El género no puede exceder 100 caracteres');
+    validateMaxLength($data, 'comentario', 1000, 'El comentario no puede exceder 1000 caracteres');
+    validateNumeric($data, 'plataforma_id', 'La plataforma debe ser un número válido');
+    validateNumeric($data, 'valor', 'El valor debe ser numérico');
+    validateNumeric($data, 'lanzamiento', 'El año de lanzamiento debe ser numérico');
+    validateRange($data, 'lanzamiento', 1900, 2099, 'El año de lanzamiento debe estar entre 1900 y 2099');
+    validateRange($data, 'valor', 0, 999999999, 'El valor no es válido');
+    validateRange($data, 'puntuacion', 0, 5, 'La puntuación debe estar entre 0 y 5');
+    
     $id_imagen = generateIdImagen();
     
     $stmt = $pdo->prepare("INSERT INTO juegos 
@@ -206,6 +220,20 @@ function updateGame($id) {
     
     requireId($id, 'ID de juego requerido');
     $data = getJsonInput();
+    
+    if (isset($data['titulo'])) validateRequired($data, 'titulo', 'El título es requerido');
+    if (isset($data['titulo'])) validateMaxLength($data, 'titulo', 255, 'El título no puede exceder 255 caracteres');
+    if (isset($data['desarrollador'])) validateMaxLength($data, 'desarrollador', 255, 'El desarrollador no puede exceder 255 caracteres');
+    if (isset($data['publicador'])) validateMaxLength($data, 'publicador', 255, 'El publicador no puede exceder 255 caracteres');
+    if (isset($data['genero'])) validateMaxLength($data, 'genero', 100, 'El género no puede exceder 100 caracteres');
+    if (isset($data['comentario'])) validateMaxLength($data, 'comentario', 1000, 'El comentario no puede exceder 1000 caracteres');
+    if (isset($data['plataforma_id']) && $data['plataforma_id'] !== '') validateNumeric($data, 'plataforma_id', 'La plataforma debe ser un número válido');
+    if (isset($data['valor']) && $data['valor'] !== '') validateNumeric($data, 'valor', 'El valor debe ser numérico');
+    if (isset($data['lanzamiento']) && $data['lanzamiento'] !== '') {
+        validateNumeric($data, 'lanzamiento', 'El año de lanzamiento debe ser numérico');
+        validateRange($data, 'lanzamiento', 1900, 2099, 'El año de lanzamiento debe estar entre 1900 y 2099');
+    }
+    if (isset($data['puntuacion']) && $data['puntuacion'] !== '' && $data['puntuacion'] !== null) validateRange($data, 'puntuacion', 0, 5, 'La puntuación debe estar entre 0 y 5');
     
     // Obtener datos actuales
     $stmt = $pdo->prepare("SELECT * FROM juegos WHERE id = ?");

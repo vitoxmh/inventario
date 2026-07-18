@@ -94,7 +94,16 @@ function createAccesorio() {
     global $pdo;
     
     $data = getJsonInput();
-    validateRequired($data, 'nombre', 'Nombre es requerido');
+    validateRequired($data, 'nombre', 'El nombre es requerido');
+    validateMaxLength($data, 'nombre', 255, 'El nombre no puede exceder 255 caracteres');
+    validateMaxLength($data, 'tipo', 100, 'El tipo no puede exceder 100 caracteres');
+    validateMaxLength($data, 'comentario', 1000, 'El comentario no puede exceder 1000 caracteres');
+    validateNumeric($data, 'plataforma', 'La plataforma debe ser un número válido');
+    validateNumeric($data, 'anio', 'El año debe ser numérico');
+    if (isset($data['anio']) && $data['anio'] !== '' && $data['anio'] !== null) validateRange($data, 'anio', 1900, 2099, 'El año debe estar entre 1900 y 2099');
+    validateNumeric($data, 'precio', 'El precio debe ser numérico');
+    validateRange($data, 'precio', 0, 999999999, 'El precio no es válido');
+    
     $id_imagen = generateIdImagen();
     
     $stmt = $pdo->prepare("INSERT INTO accesorios (id_imagen, nombre, tipo, plataforma, anio, estado, precio, comentario) 
@@ -119,7 +128,16 @@ function updateAccesorio($id) {
     
     requireId($id, 'ID requerido');
     $data = getJsonInput();
-    validateRequired($data, 'nombre', 'Nombre es requerido');
+    validateRequired($data, 'nombre', 'El nombre es requerido');
+    validateMaxLength($data, 'nombre', 255, 'El nombre no puede exceder 255 caracteres');
+    validateMaxLength($data, 'tipo', 100, 'El tipo no puede exceder 100 caracteres');
+    validateMaxLength($data, 'comentario', 1000, 'El comentario no puede exceder 1000 caracteres');
+    validateNumeric($data, 'plataforma', 'La plataforma debe ser un número válido');
+    if (isset($data['anio']) && $data['anio'] !== '' && $data['anio'] !== null) {
+        validateNumeric($data, 'anio', 'El año debe ser numérico');
+        validateRange($data, 'anio', 1900, 2099, 'El año debe estar entre 1900 y 2099');
+    }
+    validateNumeric($data, 'precio', 'El precio debe ser numérico');
     
     $stmt = $pdo->prepare("UPDATE accesorios SET nombre = ?, tipo = ?, plataforma = ?, anio = ?, estado = ?, precio = ?, comentario = ? 
                            WHERE id = ?");

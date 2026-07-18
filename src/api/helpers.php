@@ -107,3 +107,38 @@ function validateRequired($data, $field, $errorMsg = null) {
         jsonResponse(['error' => $errorMsg], 400);
     }
 }
+
+function validateMaxLength($data, $field, $max, $errorMsg = null) {
+    if (isset($data[$field]) && strlen($data[$field]) > $max) {
+        $errorMsg = $errorMsg ?? "$field no puede exceder $max caracteres";
+        jsonResponse(['error' => $errorMsg], 400);
+    }
+}
+
+function validateNumeric($data, $field, $errorMsg = null) {
+    if (isset($data[$field]) && $data[$field] !== '' && $data[$field] !== null) {
+        if (!is_numeric($data[$field])) {
+            $errorMsg = $errorMsg ?? "$field debe ser numérico";
+            jsonResponse(['error' => $errorMsg], 400);
+        }
+    }
+}
+
+function validateRange($data, $field, $min, $max, $errorMsg = null) {
+    if (isset($data[$field]) && $data[$field] !== '' && $data[$field] !== null) {
+        $val = (float)$data[$field];
+        if ($val < $min || $val > $max) {
+            $errorMsg = $errorMsg ?? "$field debe estar entre $min y $max";
+            jsonResponse(['error' => $errorMsg], 400);
+        }
+    }
+}
+
+function validateImageUrl($data, $field, $errorMsg = null) {
+    if (isset($data[$field]) && $data[$field] !== '' && $data[$field] !== null) {
+        if (!filter_var($data[$field], FILTER_VALIDATE_URL)) {
+            $errorMsg = $errorMsg ?? "$field debe ser una URL válida";
+            jsonResponse(['error' => $errorMsg], 400);
+        }
+    }
+}

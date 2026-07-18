@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_URL, apiFetch } from '../../config/api';
+import { validateRequired, validateMaxLength, validateNumeric, validateRange } from '../../config/validations';
 
 export default function NewAccesorio() {
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ export default function NewAccesorio() {
         precio: "",
         comentario: ""
     });
+    const [errors, setErrors] = useState({});
     const [portada, setPortada] = useState(null);
     const [contraportada, setContraportada] = useState(null);
     const [masImagenes, setMasImagenes] = useState([]);
@@ -27,7 +29,7 @@ export default function NewAccesorio() {
     const [plataformaOptions, setPlataformaOptions] = useState([]);
 
     useEffect(() => {
-        apiFetch(`${API_URL}/games/plataformas.php`, {
+        apiFetch('/games/plataformas.php', {
             method: "GET",
         })
         .then(r => r.json())
@@ -53,13 +55,41 @@ export default function NewAccesorio() {
     const onChange = (e) => {
         const { name, value } = e.target;
         setForm({ ...form, [name]: value });
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: null }));
+        }
     };
 
     const onSubmit = async (e) => {
         e.preventDefault();
 
+        const newErrors = {};
+
+        const nombreErr = validateRequired(form.nombre, 'Nombre') || validateMaxLength(form.nombre, 'Nombre', 255);
+        if (nombreErr) newErrors.nombre = nombreErr;
+
+        const tipoErr = validateMaxLength(form.tipo, 'Tipo', 100);
+        if (tipoErr) newErrors.tipo = tipoErr;
+
+        const anioErr = validateNumeric(form.anio, 'Año') || validateRange(form.anio, 'Año', 1900, 2099);
+        if (anioErr) newErrors.anio = anioErr;
+
+        const precioErr = validateNumeric(form.precio, 'Precio') || validateRange(form.precio, 'Precio', 0, 999999999);
+        if (precioErr) newErrors.precio = precioErr;
+
+        const comentarioErr = validateMaxLength(form.comentario, 'Comentario', 1000);
+        if (comentarioErr) newErrors.comentario = comentarioErr;
+
+        const plataformaErr = validateNumeric(form.plataforma, 'Plataforma');
+        if (plataformaErr) newErrors.plataforma = plataformaErr;
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+
         try {
-            const res = await apiFetch(`${API_URL}/accesorios/`, {
+            const res = await apiFetch('/accesorios/', {
                 method: "POST",
                 body: JSON.stringify(form)
             });
@@ -75,7 +105,7 @@ export default function NewAccesorio() {
                 fd.append("juego_id", data.id_imagen);
                 fd.append("tipo", "0");
 
-                const imgRes = await apiFetch(`${API_URL}/imagenes/`, {
+                const imgRes = await apiFetch('/imagenes/', {
                     method: "POST",
                     body: fd
                 });
@@ -91,7 +121,7 @@ export default function NewAccesorio() {
                 fd.append("accesorio_id", data.id_imagen);
                 fd.append("tipo", "1");
 
-                await apiFetch(`${API_URL}/imagenes/`, {
+                await apiFetch('/imagenes/', {
                     method: "POST",
                     body: fd
                 });
@@ -103,7 +133,7 @@ export default function NewAccesorio() {
                 fd.append("accesorio_id", data.id_imagen);
                 fd.append("tipo", "2");
 
-                await apiFetch(`${API_URL}/imagenes/`, {
+                await apiFetch('/imagenes/', {
                     method: "POST",
                     body: fd
                 });
@@ -155,6 +185,7 @@ export default function NewAccesorio() {
                                     onChange={onChange}
                                     required
                                 />
+                                {errors.nombre && <span className="form-field-error">{errors.nombre}</span>}
                             </div>
                             <div>
                                 <label className="game-form-label" htmlFor="tipo">Tipo</label>
@@ -170,6 +201,7 @@ export default function NewAccesorio() {
                                         <option key={tipo} value={tipo}>{tipo}</option>
                                     ))}
                                 </select>
+                                {errors.tipo && <span className="form-field-error">{errors.tipo}</span>}
                             </div>
                             <div>
                                 <label className="game-form-label" htmlFor="plataforma">Plataforma</label>
@@ -185,6 +217,7 @@ export default function NewAccesorio() {
                                         <option key={plat.id} value={plat.id}>{plat.nombre}</option>
                                     ))}
                                 </select>
+                                {errors.plataforma && <span className="form-field-error">{errors.plataforma}</span>}
                             </div>
                             <div>
                                 <label className="game-form-label" htmlFor="anio">Año</label>
@@ -193,9 +226,13 @@ export default function NewAccesorio() {
                                     type="number"
                                     id="anio"
                                     name="anio"
+                                    min="1900"
+                                    max="2099"
+                                    step="1"
                                     value={form.anio}
                                     onChange={onChange}
                                 />
+                                {errors.anio && <span className="form-field-error">{errors.anio}</span>}
                             </div>
                             <div>
                                 <label className="game-form-label" htmlFor="estado">Estado</label>
@@ -211,6 +248,7 @@ export default function NewAccesorio() {
                                         <option key={estado} value={estado}>{estado}</option>
                                     ))}
                                 </select>
+                                {errors.estado && <span className="form-field-error">{errors.estado}</span>}
                             </div>
                             <div>
                                 <label className="game-form-label" htmlFor="precio">Precio</label>
@@ -223,6 +261,7 @@ export default function NewAccesorio() {
                                     value={form.precio}
                                     onChange={onChange}
                                 />
+                                {errors.precio && <span className="form-field-error">{errors.precio}</span>}
                             </div>
                             <div className="game-form-100">
                                 <label className="game-form-label" htmlFor="comentario">Comentario</label>
@@ -235,6 +274,7 @@ export default function NewAccesorio() {
                                     onChange={onChange}
                                     rows="3"
                                 />
+                                {errors.comentario && <span className="form-field-error">{errors.comentario}</span>}
                             </div>
                         </div>
                     </div>
