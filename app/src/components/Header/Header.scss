@@ -14,6 +14,24 @@
 		flex-wrap: wrap;
   justify-content: space-between;
 
+  &-hamburger{
+    display: none;
+    background: none;
+    border: none;
+    color: rgb(255 255 255);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    font-size: 0;
+
+    .material-icons{
+      font-size: 24px;
+    }
+
+    &:hover{
+      background-color: rgb(255 255 255 / 0.1);
+    }
+  }
 
   &-menu{
 	display: flex;
@@ -69,4 +87,42 @@
 			width: 100%;
 			left: 0;
 		}
+}
+
+@media (max-width: 1024px) {
+  .header {
+    left: 0;
+
+    &-hamburger {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &-menu {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 0 12px;
+
+    &-menu-container {
+      gap: 10px;
+    }
+
+    &-logo {
+      font-size: 1rem;
+
+      i {
+        width: 28px;
+      }
+    }
+
+    input {
+      max-width: 140px;
+    }
+  }
 }

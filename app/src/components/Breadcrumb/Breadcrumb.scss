@@ -31,3 +31,17 @@
         line-height: 1rem;
     }
 }
+
+@media (max-width: 768px) {
+    .breadcrumb {
+        font-size: 0.65rem;
+
+        &-item {
+            font-size: 0.65rem;
+        }
+
+        &-separator {
+            font-size: 0.65rem;
+        }
+    }
+}

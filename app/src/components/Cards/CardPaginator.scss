@@ -170,3 +170,31 @@
         background: #0056b3;
     }
 }
+
+@media (max-width: 768px) {
+    .search-box {
+        max-width: 100%;
+
+        .search-input {
+            padding: 10px 36px 10px 36px;
+            font-size: 14px;
+        }
+    }
+
+    .paginador {
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 10px;
+
+        &-item {
+            width: 2rem;
+            height: 2rem;
+            font-size: 0.875rem;
+
+            &-activo {
+                width: 2rem;
+                height: 2rem;
+            }
+        }
+    }
+}

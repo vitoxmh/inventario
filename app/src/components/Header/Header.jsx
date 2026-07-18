@@ -1,11 +1,17 @@
 import './Header.scss'
 import { Link, NavLink } from "react-router-dom";
+import { useSidebar } from '../../context/SidebarContext';
 
 function Header({clase = ""}) {
+  const { toggleSidebar } = useSidebar();
+
   return (
       <>
        <header className={`header ${clase}`}>
             <div className='header-menu-container'>
+                <button className='header-hamburger' onClick={toggleSidebar} aria-label="Abrir menu">
+                  <i className="material-icons">menu</i>
+                </button>
                 <div className='header-logo'>
                   <i className='bi-controlle'></i>
                   <h2>Invetario</h2>

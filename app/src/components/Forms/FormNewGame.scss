@@ -406,3 +406,50 @@
     margin: 0;
     padding: 0.125rem 0;
 }
+
+@media (max-width: 1024px) {
+    .game-form-container {
+        grid-template-columns: 1fr;
+    }
+
+    .game-form-data {
+        grid-column: span 1;
+    }
+
+    .game-form-aside {
+        grid-column: span 1;
+    }
+
+    .game-form-action-button {
+        position: relative;
+        right: auto;
+        bottom: auto;
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .game-form-title {
+        font-size: 2rem;
+    }
+
+    .game-form-container-inputs {
+        grid-template-columns: 1fr;
+    }
+
+    .game-form-checkbox-group {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+
+    .game-form-container {
+        gap: 1rem;
+    }
+
+    .game-form-drop {
+        padding: 1.5rem;
+    }
+
+    .game-form-drop-image {
+        aspect-ratio: 1;
+    }
+}

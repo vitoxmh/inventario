@@ -96,3 +96,22 @@
 .link:hover {
   text-decoration: underline;
 }
+
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+
+    input, select {
+      width: 100%;
+    }
+  }
+
+  .tablaContainer {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tabla {
+    min-width: 600px;
+  }
+}

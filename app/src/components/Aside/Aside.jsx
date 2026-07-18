@@ -1,11 +1,32 @@
 import './Aside.scss'
+import { Link } from 'react-router-dom';
+import { useSidebar } from '../../context/SidebarContext';
 
 export default function Aside({clase = "", plataformas = []}) {
+    const { isOpen, closeSidebar } = useSidebar();
+
+    const handleNavClick = () => {
+        closeSidebar();
+    };
 
     return (
     <> 
-     <aside className={"sidebar " + clase}>
+     <div className={"sidebar-overlay" + (isOpen ? " sidebar-overlay--active" : "")} onClick={closeSidebar}></div>
+     <aside className={"sidebar " + clase + (isOpen ? " sidebar--open" : "")}>
+         <button className='sidebar-close' onClick={closeSidebar} aria-label="Cerrar menu">
+           <i className="material-icons">close</i>
+         </button>
          <h1 className='title'><i className='title-icono bi-controller'></i>INVENTARIO</h1>
+         <nav className='nav sidebar-nav-mobile'>
+            <p className='nav-text'>Navegación</p>
+            <Link to="/" className='nav-item' onClick={handleNavClick}><i className="material-icons">home</i>Home</Link>
+            <Link to="/games/" className='nav-item' onClick={handleNavClick}><i className="material-icons">sports_esports</i>Games</Link>
+            <Link to="/consolas/" className='nav-item' onClick={handleNavClick}><i className="material-icons">desktop_windows</i>Consolas</Link>
+            <Link to="/amiibos/" className='nav-item' onClick={handleNavClick}><i className="material-icons">figures</i>Amiibos</Link>
+            <Link to="/libros/" className='nav-item' onClick={handleNavClick}><i className="material-icons">book</i>Libros</Link>
+            <Link to="/accesorios/" className='nav-item' onClick={handleNavClick}><i className="material-icons">headphones</i>Accesorios</Link>
+            <Link to="/plataformas/" className='nav-item' onClick={handleNavClick}><i className="material-icons">devices</i>Plataformas</Link>
+         </nav>
          <nav className='nav'>
             <p className='nav-text'>Libreria</p>
             <a href="#" className='nav-all'><i className="material-icons">inventory_2</i>Toda la colección <span>1,246</span></a>

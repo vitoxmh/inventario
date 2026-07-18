@@ -1,6 +1,6 @@
 .list-info{
 	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 	gap: 1.5rem;
 	margin-bottom: 30px;
 
@@ -53,6 +53,16 @@
 			&--white{
 				color: rgb(148 163 184);
 			}
+		}
+	}
+}
+
+@media (max-width: 768px) {
+	.list-info {
+		gap: 1rem;
+
+		&-box {
+			padding: 1rem;
 		}
 	}
 }

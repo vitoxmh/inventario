@@ -21,7 +21,7 @@
 	}
 
 	&-container{
-		grid-template-columns: repeat(5, minmax(0, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 		display: grid;
 		gap: 2rem;
         margin-bottom: 1rem;
@@ -160,6 +160,16 @@
                 width: 100%;
                 z-index: 3;
             }
+		}
+	}
+}
+
+@media (max-width: 768px) {
+	.list-cards-container {
+		gap: 1rem;
+
+		&-card {
+			aspect-ratio: 3/4;
 		}
 	}
 }

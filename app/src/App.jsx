@@ -2,6 +2,7 @@ import './App.scss'
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { SidebarProvider } from "./context/SidebarContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Home from "./pages/Home/Home";
@@ -36,6 +37,7 @@ function App() {
   return (
     <>
       <AuthProvider>
+        <SidebarProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
@@ -67,6 +69,7 @@ function App() {
             <Route path="/recien-agregado/" element={<ProtectedRoute><RecienAgregado /></ProtectedRoute>} />
           </Routes>
         </BrowserRouter>
+        </SidebarProvider>
       </AuthProvider>
     </>
   )
