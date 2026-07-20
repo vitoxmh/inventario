@@ -60,6 +60,26 @@ services:
     networks:
       - app-network
 
+  api:
+    build: 
+      context: ./src-python
+      dockerfile: Dockerfile
+    container_name: api-python
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+    volumes:
+      - ./src-python:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      DB_HOST: mysql
+      DB_NAME: videojuegos
+      DB_USER: app
+      DB_PASSWORD: app
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge

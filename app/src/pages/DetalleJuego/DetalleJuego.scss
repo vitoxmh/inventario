@@ -320,6 +320,17 @@
 }
 
 @media (max-width: 1024px) {
+  .main-detalle {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .main-detalle .container-main {
+    height: auto;
+    min-height: calc(100vh - 64px);
+    overflow-y: visible;
+  }
+
   .detalle-juego {
     &-title {
       width: 100%;
@@ -345,6 +356,13 @@
 }
 
 @media (max-width: 768px) {
+  .main-detalle .container-main {
+    height: auto;
+    min-height: calc(100vh - 64px);
+    overflow-y: visible;
+    padding: 12px;
+  }
+
   .detalle-juego {
     margin-top: 15px;
 
@@ -374,9 +392,5 @@
         line-height: 1.75rem;
       }
     }
-  }
-
-  .sidebar-detalle-juego {
-    margin-top: 0;
   }
 }

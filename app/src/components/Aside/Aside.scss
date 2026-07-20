@@ -177,12 +177,39 @@
     padding: 0;
     height: auto;
     overflow: visible;
+    transform: none;
+
+    .sidebar-imagen-principal {
+      height: 300px;
+      border-radius: 12px;
+    }
+
+    .sidebar-details-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .sidebar-edit-button {
+      grid-column: 1 / -1;
+    }
   }
 }
 
 @media (max-width: 768px) {
   .sidebar-detalle-juego {
-    margin-top: 1rem;
+    margin-top: 0;
+
+    .sidebar-imagen-principal {
+      height: 448px;
+    width: 93%;
+    margin: 90px auto 10px;
+    }
+
+    .sidebar-details-info {
+      grid-template-columns: 1fr;
+    }
   }
 }
 

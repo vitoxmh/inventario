@@ -96,7 +96,7 @@ export default function DetalleJuego() {
         <>
         <div className="container">
             <Header clase="header-detalle-juego" />
-            <main className='main'>
+            <main className='main main-detalle'>
                  <AsideGame clase={"sidebar-detalle-juego"}
                   section={"/editar-juego"} 
                   imgPortada={juego.portada}
