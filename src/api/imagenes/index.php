@@ -6,6 +6,15 @@ ini_set('memory_limit', '128M');
 require_once __DIR__ . '/../helpers.php';
 require_once __DIR__ . '/../middleware/auth.php';
 
+define('MAX_FILE_SIZE', 5 * 1024 * 1024);
+define('ALLOWED_MIME_TYPES', [
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+    'image/gif'
+]);
+define('ALLOWED_EXTENSIONS', ['jpg', 'jpeg', 'png', 'webp', 'gif']);
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
@@ -19,15 +28,6 @@ if ($method === 'GET') {
 } else {
     errorResponse('Método no permitido', 405);
 }
-
-define('MAX_FILE_SIZE', 5 * 1024 * 1024);
-define('ALLOWED_MIME_TYPES', [
-    'image/jpeg',
-    'image/png',
-    'image/webp',
-    'image/gif'
-]);
-define('ALLOWED_EXTENSIONS', ['jpg', 'jpeg', 'png', 'webp', 'gif']);
 
 function validateUploadedFile($file) {
     if ($file['error'] !== UPLOAD_ERR_OK) {
