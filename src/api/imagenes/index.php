@@ -11,7 +11,8 @@ define('ALLOWED_MIME_TYPES', [
     'image/jpeg',
     'image/png',
     'image/webp',
-    'image/gif'
+    'image/gif',
+    'image/jpg'
 ]);
 define('ALLOWED_EXTENSIONS', ['jpg', 'jpeg', 'png', 'webp', 'gif']);
 
