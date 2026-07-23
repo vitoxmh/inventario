@@ -111,7 +111,7 @@ function uploadImagenes() {
     $type = $_POST['tipo'] ?? 'imagen';
     $type = sanitizeString($type);
     
-    $allowedTypes = ['imagen', 'portada', 'contraportada', 'poster', 'logo', '0', '1', '2', '3'];
+    $allowedTypes = ['imagen', 'portada', 'contraportada', 'poster', 'logo', '0', '1', '2', '3', '4'];
     if (!in_array($type, $allowedTypes)) {
         errorResponse("Tipo de imagen inválido", 400);
     }
